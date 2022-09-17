@@ -11,16 +11,38 @@ use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
 
 #[wasm_bindgen]
-pub fn play() -> Vec<f32> {
-    let sound = chain(note![A: C3, 1 / 4]);
+pub fn play(tone: i32) -> Vec<f32> {
+    // let sound = rack(note![A: C3, 1 / 4]);
+    let sound = get_synth_sound(tone);
     graph(&sound);
     sound.iter().map(|&x| x as f32).collect()
 }
 
 #[wasm_bindgen]
-pub fn draw() -> String {
-    let sound = chain(note![A: C3, 1 / 4]);
+pub fn draw(tone: i32) -> String {
+    // let sound = rack(note![A: C3, 1 / 4]);
+    let sound = get_synth_sound(tone);
     graph(&sound)
+}
+
+pub fn get_synth_sound(tone: i32) -> Vec<f64> {
+    let pc = match tone {
+        0 => PitchClass::C,
+        1 => PitchClass::Cis,
+        2 => PitchClass::D,
+        3 => PitchClass::Dis,
+        4 => PitchClass::E,
+        5 => PitchClass::F,
+        6 => PitchClass::Fis,
+        7 => PitchClass::G,
+        8 => PitchClass::Gis,
+        9 => PitchClass::A,
+        10 => PitchClass::B,
+        11 => PitchClass::H,
+        _ => todo!(),
+    };
+    let n = Note::Tone(pc, Octave::C3, val![1 / 4]);
+    rack(n)
 }
 
 fn sine(note: Note) -> Vec<f64> {

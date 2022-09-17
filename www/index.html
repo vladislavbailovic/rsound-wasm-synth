@@ -7,7 +7,71 @@
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script type="module" src="./index.js"></script>
-	<img id="graph" style="max-width:100%;min-width:80%; display: block" src="" />
-	<button>Play?</button>
+
+	<div id="interface">
+
+		<img id="graph" style="max-width:100%;min-width:80%; display: block" src="" />
+
+<style type="text/css">
+#interface {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.piano {
+	display: flex;
+	margin-top: 1rem;
+}
+.piano .key {
+	position: relative;
+	float: left;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	padding: 0.5rem 0;
+	user-select: none;
+	cursor: pointer;
+}
+.piano .key {
+	width: 3.5rem;
+	height: 10rem;
+	z-index: 1;
+	border-left: 1px solid hsl(0, 0%, 73%);
+	border-bottom: 1px solid hsl(0, 0%, 73%);
+	border-radius: 0 0 5px 5px;
+	background: linear-gradient(to bottom, hsl(0, 0%, 93%) 0%, white 100%);
+	color: black;
+}
+
+.piano .key.black {
+	height: 8rem;
+	width: 2rem;
+	margin: 0 0 0 -1rem;
+	z-index: 2;
+	border: 1px solid black;
+	border-radius: 0 0 3px 3px;
+	background: linear-gradient(45deg, hsl(0, 0%, 13%) 0%, hsl(0, 0%, 33%) 100%);
+	color: white;
+}
+.piano .key.offset {
+	margin: 0 0 0 -1rem;
+}
+</style>
+<div class="piano">
+	<button class="key">C</button>
+	<button class="key black">Cis</button>
+	<button class="key offset">D</button>
+	<button class="key black">Dis</button>
+	<button class="key offset">E</button>
+	<button class="key">F</button>
+	<button class="key black">Fis</button>
+	<button class="key offset">G</button>
+	<button class="key black">Gis</button>
+	<button class="key offset">A</button>
+	<button class="key black">B</button>
+	<button class="key offset">H</button>
+</div>
+
+		</div><!-- interface -->
   </body>
 </html>
