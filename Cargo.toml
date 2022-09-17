@@ -11,8 +11,19 @@ crate_type = ["cdylib"]
 wasm-bindgen = "0.2"
 note = { version="^0", path="../rsound-note" }
 instrument = { version="^0", path="../rsound-instrument" }
-graph = { version="^0", path="../rsound-graph", optional=true }
-rsound-output = { version="^0", path="../rsound-output", optional=true }
+graph = { version="^0", path="../rsound-graph" }
+rsound-output = { version="^0", path="../rsound-output" }
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'HtmlDivElement',
+  'SvgElement',
+  'Node',
+  'Window',
+]
 
 [features]
-default=["graph", "rsound-output"]

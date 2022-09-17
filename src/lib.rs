@@ -12,7 +12,15 @@ use rsound_output::{audio::PcmRenderer, Buffer};
 
 #[wasm_bindgen]
 pub fn play() -> Vec<f32> {
-    chain(note![A: C3, 1 / 2]).iter().map(|&x| x as f32).collect()
+    let sound = chain(note![A: C3, 1 / 4]);
+    graph(&sound);
+    sound.iter().map(|&x| x as f32).collect()
+}
+
+#[wasm_bindgen]
+pub fn draw() -> String {
+    let sound = chain(note![A: C3, 1 / 4]);
+    graph(&sound)
 }
 
 fn sine(note: Note) -> Vec<f64> {
@@ -59,4 +67,50 @@ fn rack(note: Note) -> Vec<f64> {
     let s2 = Instrument::new(generator::simple::Simple::square(), e2);
     rack.add(s2);
     rack.play(90.0, note, 1.0)
+}
+
+use graph::svg::Renderer;
+use graph::{Block, Graph, Line};
+use rsound_output::OutputRenderer;
+
+fn graph(sound: &[f64]) -> String {
+    let minimum = sound
+        .iter()
+        .filter_map(|&x| Some(x))
+        .reduce(f64::min)
+        .expect("there has to be minimum");
+    let values: Vec<Block> = sound
+        .iter()
+        .step_by(10)
+        .map(|y| Block::new(1.0, y + minimum.abs()))
+        .collect();
+
+    let graph = Line::new(&values);
+    let mut renderer = Renderer::new(graph.size());
+    graph.draw(&mut renderer);
+
+    let header = if let Some(header) = renderer.get_header() {
+        if let Ok(buffer) = String::from_utf8(header) {
+            buffer
+        } else {
+            String::new()
+        }
+    } else {
+        String::new()
+    };
+    let footer = if let Some(footer) = renderer.get_footer() {
+        if let Ok(buffer) = String::from_utf8(footer) {
+            buffer
+        } else {
+            String::new()
+        }
+    } else {
+        String::new()
+    };
+    let buffer = if let Ok(buffer) = String::from_utf8(renderer.get_buffer().to_vec()) {
+        buffer
+    } else {
+        String::new()
+    };
+    format!("{}{}{}", header, buffer, footer)
 }
