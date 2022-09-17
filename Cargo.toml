@@ -1,0 +1,18 @@
+[package]
+name = "rsound-wasm-synth"
+description = "A modular WASM synth"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate_type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+note = { version="^0", path="../rsound-note" }
+instrument = { version="^0", path="../rsound-instrument" }
+graph = { version="^0", path="../rsound-graph", optional=true }
+rsound-output = { version="^0", path="../rsound-output", optional=true }
+
+[features]
+default=["graph", "rsound-output"]
