@@ -21,21 +21,19 @@ pub struct Modulator {
 
 #[wasm_bindgen]
 pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
-    // let sound = rack(note![A: C3, 1 / 4]);
     let sound = get_synth_sound(tone, base, mods);
     graph(&sound);
     sound.iter().map(|&x| x as f32).collect()
 }
 
 #[wasm_bindgen]
-pub fn draw(tone: i32, base: i32, mods: Vec<JsValue>) -> String {
-    // let sound = rack(note![A: C3, 1 / 4]);
+pub fn draw(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<u8> {
     let sound = get_synth_sound(tone, base, mods);
     graph(&sound)
 }
 
 #[wasm_bindgen]
-pub fn draw_oscillator() -> String {
+pub fn draw_oscillator() -> Vec<u8> {
     let sample_len = 1000;
     let osc = oscillator::Oscillator::Sine;
     let mut result = vec![0.0; sample_len];
@@ -47,7 +45,7 @@ pub fn draw_oscillator() -> String {
 }
 
 #[wasm_bindgen]
-pub fn draw_lfo(shape: i32, freq: i32) -> String {
+pub fn draw_lfo(shape: i32, freq: i32) -> Vec<u8> {
     let sample_len = 1000;
     let osc = match shape {
         1 => lfo::LFO::square(freq as f64),
@@ -104,57 +102,12 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     synth.play(90.0, n, 1.0)
 }
 
-fn sine(note: Note) -> Vec<f64> {
-    let envelope = envelope::ASR::new(0.015, 0.07);
-    let synth = Instrument::new(generator::simple::Simple::default(), envelope);
-    synth.play(90.0, note, 1.0)
-}
-
-fn chain(note: Note) -> Vec<f64> {
-    let envelope = envelope::ASR::new(0.015, 0.07);
-    let mut chain = generator::chain::Chain::new(Oscillator::Square);
-    let elfo = lfo::ELFO::triangle(31.0).with_envelope(envelope::ASR::new(0.0, 0.15));
-    chain.add(lfo::LFO::sine(12.0));
-    chain.sub(lfo::LFO::triangle(131.0));
-    chain.sub(elfo);
-    let synth = Instrument::new(chain, envelope);
-    synth.play(90.0, note, 1.0)
-}
-
-fn detuned(note: Note) -> Vec<f64> {
-    let e1 = envelope::ASR::new(0.05, 0.05);
-
-    let mut rack = Rack::default();
-    let s1 = Instrument::new(generator::simple::Simple::default(), e1);
-    rack.add(s1);
-    let s2 = Instrument::new(generator::detuned::Semitones::square(3), envelope::Fixed {});
-    rack.add(s2);
-
-    let s3 = Instrument::new(generator::detuned::Freq::square(13.0), envelope::Fixed {});
-    rack.add_with_volume(s3, 0.5);
-    let s4 = Instrument::new(generator::detuned::Freq::square(-12.0), envelope::Fixed {});
-    rack.add_with_volume(s4, 0.5);
-
-    rack.play(90.0, note, 1.0)
-}
-
-fn rack(note: Note) -> Vec<f64> {
-    let e1 = envelope::ASR::new(0.0, 0.1);
-    let e2 = envelope::ASR::new(0.1, 0.0);
-
-    let mut rack = Rack::default();
-    let s1 = Instrument::new(generator::simple::Simple::default(), e1);
-    rack.add(s1);
-    let s2 = Instrument::new(generator::simple::Simple::square(), e2);
-    rack.add(s2);
-    rack.play(90.0, note, 1.0)
-}
 
 use graph::svg::Renderer;
 use graph::{Block, Graph, Line};
 use rsound_output::OutputRenderer;
 
-fn graph(sound: &[f64]) -> String {
+fn graph(sound: &[f64]) -> Vec<u8> {
     let minimum = sound
         .iter()
         .filter_map(|&x| Some(x))
@@ -170,28 +123,14 @@ fn graph(sound: &[f64]) -> String {
     let mut renderer = Renderer::new(graph.size());
     graph.draw(&mut renderer);
 
-    let header = if let Some(header) = renderer.get_header() {
-        if let Ok(buffer) = String::from_utf8(header) {
-            buffer
-        } else {
-            String::new()
-        }
-    } else {
-        String::new()
-    };
-    let footer = if let Some(footer) = renderer.get_footer() {
-        if let Ok(buffer) = String::from_utf8(footer) {
-            buffer
-        } else {
-            String::new()
-        }
-    } else {
-        String::new()
-    };
-    let buffer = if let Ok(buffer) = String::from_utf8(renderer.get_buffer().to_vec()) {
-        buffer
-    } else {
-        String::new()
-    };
-    format!("{}{}{}", header, buffer, footer)
+    let mut out = Vec::new();
+    if let Some(mut header) = renderer.get_header() {
+        out.append(&mut header);
+    }
+    out.append(&mut renderer.get_buffer().to_vec());
+    if let Some(mut footer) = renderer.get_footer() {
+        out.append(&mut footer);
+    }
+
+    out
 }
