@@ -52,9 +52,10 @@ const updateModulators = () => {
 const getMods = () => {
 	let mods = [];
 	document.querySelectorAll('.synth .link.modulator').forEach(mod => {
+		const kind = mod.querySelector('input[type="hidden"]').value == 'add' ? 1 : 0;
 		const shape = mod.querySelector('select').selectedIndex;
 		const freq = mod.querySelector('input[type="numeric"]').value;
-		mods.push({ shape: Number(shape), freq: Number(freq) });
+		mods.push({ kind: kind, shape: Number(shape), freq: Number(freq) });
 	});
 	return mods;
 };
@@ -68,26 +69,30 @@ const handleParamChange = e => {
 const handleModulatorAdd = e => {
 	const tpl = document.querySelector("#modulator");
 	const mod = tpl.content.cloneNode(true);
-	console.log(mod)
 	mod.querySelector('input[type="hidden"]').value = 'add';
 	mod.querySelector('.link').classList.add('add');
 
-	document.querySelector('.synth .link').after(mod);
-	updateEvents();
-	updateSource();
+	document.querySelector('.synth .link:last-child').after(mod);
 	updateModulators();
+	updateSynth(0);
+	updateEvents();
 };
 const handleModulatorSub = e => {
 	const tpl = document.querySelector("#modulator");
 	const mod = tpl.content.cloneNode(true);
-	console.log(mod)
 	mod.querySelector('input[type="hidden"]').value = 'sub';
 	mod.querySelector('.link').classList.add('sub');
 
-	document.querySelector('.synth .link').after(mod);
-	updateEvents();
-	updateSource();
+	document.querySelector('.synth .link:last-child').after(mod);
 	updateModulators();
+	updateSynth(0);
+	updateEvents();
+};
+const handleModulatorKill = e => {
+	e.target.closest('.link').remove();
+	updateModulators();
+	updateSynth(0);
+	updateEvents();
 };
 
 const updateEvents = () => {
@@ -106,6 +111,10 @@ const updateEvents = () => {
 	document.querySelectorAll('.synth .link .next button.sub').forEach(inpt => {
 		inpt.removeEventListener('click', handleModulatorSub);
 		inpt.addEventListener('click', handleModulatorSub);
+	});
+	document.querySelectorAll('.synth .link .next button.kill').forEach(inpt => {
+		inpt.removeEventListener('click', handleModulatorKill);
+		inpt.addEventListener('click', handleModulatorKill);
 	});
 };
 

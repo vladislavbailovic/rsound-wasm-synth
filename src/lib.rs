@@ -14,6 +14,7 @@ use rsound_output::{audio::PcmRenderer, Buffer};
 use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize)]
 pub struct Modulator {
+    pub kind: i32,
     pub shape: i32,
     pub freq: i32,
 }
@@ -93,7 +94,10 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
             3 => lfo::LFO::saw(modulator.freq as f64),
             _ => lfo::LFO::sine(modulator.freq as f64),
         };
-        chain.add(m);
+        match modulator.kind {
+            1 => chain.add(m),
+            _ => chain.sub(m),
+        };
     }
 
     let synth = Instrument::new(chain, envelope);
