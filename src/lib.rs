@@ -11,8 +11,15 @@ use instrument::*;
 use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
 
+use serde::{Serialize, Deserialize};
+#[derive(Serialize, Deserialize)]
+pub struct Modulator {
+    pub shape: i32,
+    pub freq: i32,
+}
+
 #[wasm_bindgen]
-pub fn play(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f32> {
+pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
     // let sound = rack(note![A: C3, 1 / 4]);
     let sound = get_synth_sound(tone, base, mods);
     graph(&sound);
@@ -20,7 +27,7 @@ pub fn play(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f32> {
 }
 
 #[wasm_bindgen]
-pub fn draw(tone: i32, base: i32, mods: Vec<i32>) -> String {
+pub fn draw(tone: i32, base: i32, mods: Vec<JsValue>) -> String {
     // let sound = rack(note![A: C3, 1 / 4]);
     let sound = get_synth_sound(tone, base, mods);
     graph(&sound)
@@ -55,7 +62,7 @@ pub fn draw_lfo(shape: i32, freq: i32) -> String {
     graph(&result)
 }
 
-pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f64> {
+pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     let pc = match tone {
         0 => PitchClass::C,
         1 => PitchClass::Cis,
@@ -78,8 +85,15 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f64> {
         1 => generator::chain::Chain::new(Oscillator::Square),
         _ => generator::chain::Chain::new(Oscillator::Sine)
     };
-    for hz in mods {
-        chain.add(lfo::LFO::sine(hz as f64));
+    for res in mods {
+        let modulator: Modulator = serde_wasm_bindgen::from_value(res).unwrap();
+        let m = match modulator.shape {
+            1 => lfo::LFO::square(modulator.freq as f64),
+            2 => lfo::LFO::triangle(modulator.freq as f64),
+            3 => lfo::LFO::saw(modulator.freq as f64),
+            _ => lfo::LFO::sine(modulator.freq as f64),
+        };
+        chain.add(m);
     }
 
     let synth = Instrument::new(chain, envelope);

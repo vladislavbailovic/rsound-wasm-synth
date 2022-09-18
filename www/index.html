@@ -39,32 +39,35 @@
 				</div><!-- next -->
 			</div>
 
-			<div class="link modulator">
-				<div class="shape">
-					<div class="display">
-						<img class="graph" src="" />
-					</div>
-					<div class="params">
-						<label>
-							<select>
-								<option>Sine</option>
-								<option>Square</option>
-								<option>Triangle</option>
-								<option>Saw</option>
-							</select>
-						</label>
-						<label>
-							<input type="numeric" value="45" />
-							<span>Hz</span>
-						</label>
-					</div><!-- params -->
-				</div><!-- .shape -->
-				<div class="next">
-					<button class="add">Add</button>
-					<button class="sub">Sub</button>
-				</div><!-- next -->
-			</div><!-- .link.modulator -->
 		</div>
+<template id="modulator">
+	<div class="link modulator">
+		<input type="hidden" value="1" />
+		<div class="shape">
+			<div class="display">
+				<img class="graph" src="" />
+			</div>
+			<div class="params">
+				<label>
+					<select>
+						<option>Sine</option>
+						<option>Square</option>
+						<option>Triangle</option>
+						<option>Saw</option>
+					</select>
+				</label>
+				<label>
+					<input type="numeric" value="45" />
+					<span>Hz</span>
+				</label>
+			</div><!-- params -->
+		</div><!-- .shape -->
+		<div class="next">
+			<button class="add">Add</button>
+			<button class="sub">Sub</button>
+		</div><!-- next -->
+	</div><!-- .link.modulator -->
+</template>
 
 <style type="text/css">
 #interface {
@@ -93,6 +96,8 @@ img.graph {
 .synth .link {
 	display: flex;
 	margin: 5px;
+	padding: 5px;
+	border: 1px solid #aaa;
 }
 .synth .link .shape {
 	display: flex;

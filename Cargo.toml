@@ -9,6 +9,8 @@ crate_type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = "0.4"
 note = { version="^0", path="../rsound-note" }
 instrument = { version="^0", path="../rsound-instrument" }
 graph = { version="^0", path="../rsound-graph" }

@@ -54,31 +54,67 @@ const getMods = () => {
 	document.querySelectorAll('.synth .link.modulator').forEach(mod => {
 		const shape = mod.querySelector('select').selectedIndex;
 		const freq = mod.querySelector('input[type="numeric"]').value;
-		mods.push(Number(freq));
+		mods.push({ shape: Number(shape), freq: Number(freq) });
 	});
-	console.log(mods);
 	return mods;
+};
+
+const handleParamChange = e => {
+	updateSynth(0);
+	updateSource();
+	updateModulators();
+};
+
+const handleModulatorAdd = e => {
+	const tpl = document.querySelector("#modulator");
+	const mod = tpl.content.cloneNode(true);
+	console.log(mod)
+	mod.querySelector('input[type="hidden"]').value = 'add';
+	mod.querySelector('.link').classList.add('add');
+
+	document.querySelector('.synth .link').after(mod);
+	updateEvents();
+	updateSource();
+	updateModulators();
+};
+const handleModulatorSub = e => {
+	const tpl = document.querySelector("#modulator");
+	const mod = tpl.content.cloneNode(true);
+	console.log(mod)
+	mod.querySelector('input[type="hidden"]').value = 'sub';
+	mod.querySelector('.link').classList.add('sub');
+
+	document.querySelector('.synth .link').after(mod);
+	updateEvents();
+	updateSource();
+	updateModulators();
+};
+
+const updateEvents = () => {
+	document.querySelectorAll('.synth .link.modulator input[type="numeric"]').forEach(inpt => {
+		inpt.removeEventListener('change', handleParamChange);
+		inpt.addEventListener('change', handleParamChange);
+	});
+	document.querySelectorAll('.synth .link.modulator select').forEach(inpt => {
+		inpt.removeEventListener('change', handleParamChange);
+		inpt.addEventListener('change', handleParamChange);
+	});
+	document.querySelectorAll('.synth .link .next button.add').forEach(inpt => {
+		inpt.removeEventListener('click', handleModulatorAdd);
+		inpt.addEventListener('click', handleModulatorAdd);
+	});
+	document.querySelectorAll('.synth .link .next button.sub').forEach(inpt => {
+		inpt.removeEventListener('click', handleModulatorSub);
+		inpt.addEventListener('click', handleModulatorSub);
+	});
 };
 
 init().then(res => {
 
-	document.querySelectorAll('.synth .link.modulator input[type="numeric"]').forEach(inpt => {
-		inpt.addEventListener('change', () => {
-			updateSynth(0);
-			updateSource();
-			updateModulators();
-		});
-	});
-	document.querySelectorAll('.synth .link.modulator select').forEach(inpt => {
-		inpt.addEventListener('change', () => {
-			updateSynth(0);
-			updateSource();
-			updateModulators();
-		});
-	});
 	updateSynth(0);
 	updateSource();
 	updateModulators();
+	updateEvents();
 
 	document.querySelectorAll('.piano button').forEach((button, idx) => {
 		button.addEventListener('click', () => {
