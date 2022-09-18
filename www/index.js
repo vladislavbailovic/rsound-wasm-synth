@@ -10,7 +10,7 @@ const update = tone => {
 		gain.gain.volume = 0.5;
 		gain.connect(audioCtx.destination);
 
-		const result = play(tone);
+		const result = play(tone, 0, getMods());
 		const buffer = audioCtx.createBuffer(1, result.length, 44100);
 		buffer.copyToChannel(result, 0);
 
@@ -23,7 +23,7 @@ const update = tone => {
 };
 
 const updateSynth = tone => {
-	const graph = draw(tone);
+	const graph = draw(tone, 0, getMods());
 	const blob = new Blob([graph], {type: "image/svg+xml"});
 	const temp_url = window.URL.createObjectURL(blob);
 	document.getElementById("graph").setAttribute("src", temp_url);
@@ -47,6 +47,17 @@ const updateModulators = () => {
 		const modGraphUrl = window.URL.createObjectURL(modBlob);
 		mod.querySelector('img.graph').setAttribute('src', modGraphUrl);
 	});
+};
+
+const getMods = () => {
+	let mods = [];
+	document.querySelectorAll('.synth .link.modulator').forEach(mod => {
+		const shape = mod.querySelector('select').selectedIndex;
+		const freq = mod.querySelector('input[type="numeric"]').value;
+		mods.push(Number(freq));
+	});
+	console.log(mods);
+	return mods;
 };
 
 init().then(res => {

@@ -12,17 +12,17 @@ use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
 
 #[wasm_bindgen]
-pub fn play(tone: i32) -> Vec<f32> {
+pub fn play(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f32> {
     // let sound = rack(note![A: C3, 1 / 4]);
-    let sound = get_synth_sound(tone);
+    let sound = get_synth_sound(tone, base, mods);
     graph(&sound);
     sound.iter().map(|&x| x as f32).collect()
 }
 
 #[wasm_bindgen]
-pub fn draw(tone: i32) -> String {
+pub fn draw(tone: i32, base: i32, mods: Vec<i32>) -> String {
     // let sound = rack(note![A: C3, 1 / 4]);
-    let sound = get_synth_sound(tone);
+    let sound = get_synth_sound(tone, base, mods);
     graph(&sound)
 }
 
@@ -55,7 +55,7 @@ pub fn draw_lfo(shape: i32, freq: i32) -> String {
     graph(&result)
 }
 
-pub fn get_synth_sound(tone: i32) -> Vec<f64> {
+pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<i32>) -> Vec<f64> {
     let pc = match tone {
         0 => PitchClass::C,
         1 => PitchClass::Cis,
@@ -72,7 +72,18 @@ pub fn get_synth_sound(tone: i32) -> Vec<f64> {
         _ => todo!(),
     };
     let n = Note::Tone(pc, Octave::C3, val![1 / 4]);
-    rack(n)
+
+    let envelope = envelope::ASR::new(0.015, 0.07);
+    let mut chain = match base {
+        1 => generator::chain::Chain::new(Oscillator::Square),
+        _ => generator::chain::Chain::new(Oscillator::Sine)
+    };
+    for hz in mods {
+        chain.add(lfo::LFO::sine(hz as f64));
+    }
+
+    let synth = Instrument::new(chain, envelope);
+    synth.play(90.0, n, 1.0)
 }
 
 fn sine(note: Note) -> Vec<f64> {
