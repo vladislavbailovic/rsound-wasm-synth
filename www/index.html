@@ -10,7 +10,61 @@
 
 	<div id="interface">
 
-		<img id="graph" style="max-width:100%;min-width:80%; display: block" src="" />
+		<div class="display">
+			<img id="graph" class="graph" src="" />
+		</div>
+
+		<div class="synth chain">
+			<div class="link source">
+				<div class="shape">
+					<div class="display">
+						<img class="graph" src="" />
+					</div><!-- .display -->
+					<div class="params">
+						<label>
+							<select>
+								<option>Sine</option>
+								<option>Square</option>
+							</select>
+						</label>
+						<label>
+							<input type="numeric" value="440" />
+							<span>Hz</span>
+						</label>
+					</div><!-- .params -->
+				</div><!-- .shape -->
+				<div class="next">
+					<button class="add">Add</button>
+					<button class="sub">Sub</button>
+				</div><!-- next -->
+			</div>
+
+			<div class="link modulator">
+				<div class="shape">
+					<div class="display">
+						<img class="graph" src="" />
+					</div>
+					<div class="params">
+						<label>
+							<select>
+								<option>Sine</option>
+								<option>Square</option>
+								<option>Triangle</option>
+								<option>Saw</option>
+							</select>
+						</label>
+						<label>
+							<input type="numeric" value="45" />
+							<span>Hz</span>
+						</label>
+					</div><!-- params -->
+				</div><!-- .shape -->
+				<div class="next">
+					<button class="add">Add</button>
+					<button class="sub">Sub</button>
+				</div><!-- next -->
+			</div><!-- .link.modulator -->
+		</div>
 
 <style type="text/css">
 #interface {
@@ -18,6 +72,41 @@
 	flex-direction: column;
 	align-items: center;
 }
+
+img.graph {
+	max-width:100%;
+	min-width:80%;
+	display: block
+}
+
+.display {
+	display: flex;
+	width: 90%;
+	min-height: 150px;
+	overflow: hidden;
+	background: black;
+}
+
+.synth.chain {
+	display: flex;
+}
+.synth .link {
+	display: flex;
+	margin: 5px;
+}
+.synth .link .shape {
+	display: flex;
+	flex-direction: column;
+}
+.synth .link .shape .params label {
+	display: block;
+}
+.synth .link .next {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
 .piano {
 	display: flex;
 	margin-top: 1rem;

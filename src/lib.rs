@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 // }
 
 use instrument::oscillator::*;
+use instrument::generator::Signal;
 use instrument::*;
 use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
@@ -23,6 +24,35 @@ pub fn draw(tone: i32) -> String {
     // let sound = rack(note![A: C3, 1 / 4]);
     let sound = get_synth_sound(tone);
     graph(&sound)
+}
+
+#[wasm_bindgen]
+pub fn draw_oscillator() -> String {
+    let sample_len = 1000;
+    let osc = oscillator::Oscillator::Sine;
+    let mut result = vec![0.0; sample_len];
+    for i in 0..sample_len {
+        let t = i as f64 / SAMPLE_RATE as f64;
+        result[i] = osc.get(440.0).at(t);
+    }
+    graph(&result)
+}
+
+#[wasm_bindgen]
+pub fn draw_lfo(shape: i32, freq: i32) -> String {
+    let sample_len = 1000;
+    let osc = match shape {
+        1 => lfo::LFO::square(freq as f64),
+        2 => lfo::LFO::triangle(freq as f64),
+        3 => lfo::LFO::saw(freq as f64),
+        _ => lfo::LFO::sine(freq as f64),
+    };
+    let mut result = vec![0.0; sample_len];
+    for i in 0..sample_len {
+        let t = i as f64 / SAMPLE_RATE as f64;
+        result[i] = osc.value_at(t, 0.0);
+    }
+    graph(&result)
 }
 
 pub fn get_synth_sound(tone: i32) -> Vec<f64> {
