@@ -1,13 +1,19 @@
-import init, { play, draw, draw_lfo, draw_oscillator } from "./pkg/rsound_wasm_synth.js";
+import init, { play, draw, draw_lfo, draw_oscillator } from "../pkg/rsound_wasm_synth.js";
+
+class Modulator {
+	kind: number
+	shape: number
+	freq: number
+};
 
 const update = tone => {
-	const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	const audioCtx = new window.AudioContext;
 
-	updateSynth();
+	updateSynth(null);
 
 	audioCtx.resume().then(() => {
 		const gain = audioCtx.createGain();
-		gain.gain.volume = 0.5;
+		gain.gain.value = 0.5;
 		gain.connect(audioCtx.destination);
 
 		const result = play(tone, 0, getMods());
@@ -40,7 +46,7 @@ const updateSource = () => {
 const updateModulators = () => {
 	document.querySelectorAll('.synth .link.modulator').forEach(mod => {
 		const shape = mod.querySelector('select').selectedIndex;
-		const freq = mod.querySelector('input[type="numeric"]').value;
+		const freq = (mod.querySelector('input[type="numeric"]') as HTMLInputElement).value;
 		console.log("\tupdating modulator:", shape, freq, Number(freq));
 		const modGraph = draw_lfo(Number(shape), Number(freq));
 		const modBlob = new Blob([modGraph], {type: 'image/svg+xml'});
@@ -49,12 +55,12 @@ const updateModulators = () => {
 	});
 };
 
-const getMods = () => {
+const getMods = (): Array<Modulator> => {
 	let mods = [];
 	document.querySelectorAll('.synth .link.modulator').forEach(mod => {
-		const kind = mod.querySelector('input[type="hidden"]').value == 'add' ? 1 : 0;
+		const kind = (mod.querySelector('input[type="hidden"]') as HTMLInputElement).value == 'add' ? 1 : 0;
 		const shape = mod.querySelector('select').selectedIndex;
-		const freq = mod.querySelector('input[type="numeric"]').value;
+		const freq = (mod.querySelector('input[type="numeric"]') as HTMLInputElement).value;
 		mods.push({ kind: kind, shape: Number(shape), freq: Number(freq) });
 	});
 	return mods;
@@ -67,9 +73,10 @@ const handleParamChange = e => {
 };
 
 const handleModulatorAdd = e => {
-	const tpl = document.querySelector("#modulator");
-	const mod = tpl.content.cloneNode(true);
-	mod.querySelector('input[type="hidden"]').value = 'add';
+	const tpl: HTMLTemplateElement = document.querySelector("#modulator");
+	const mod = tpl.content.cloneNode(true) as HTMLElement;
+	const input: HTMLInputElement = mod.querySelector('input[type="hidden"]');
+	input.value = 'add';
 	mod.querySelector('.link').classList.add('add');
 
 	document.querySelector('.synth .link:last-child').after(mod);
@@ -78,9 +85,10 @@ const handleModulatorAdd = e => {
 	updateEvents();
 };
 const handleModulatorSub = e => {
-	const tpl = document.querySelector("#modulator");
-	const mod = tpl.content.cloneNode(true);
-	mod.querySelector('input[type="hidden"]').value = 'sub';
+	const tpl: HTMLTemplateElement = document.querySelector("#modulator");
+	const mod = tpl.content.cloneNode(true) as HTMLElement;
+	const input: HTMLInputElement = (mod as HTMLElement).querySelector('input[type="hidden"]');
+	input.value = 'sub';
 	mod.querySelector('.link').classList.add('sub');
 
 	document.querySelector('.synth .link:last-child').after(mod);
