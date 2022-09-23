@@ -1,13 +1,17 @@
 run: www
 	cd www && pwd && python -m http.server 6660
 www: www/pkg www/build
-	@echo "yay"
+	cp index.html www/
 www/pkg: src/*.rs Cargo.toml Makefile
-	wasm-pack build --target web --out-dir www/pkg
+	@mkdir -p www/pkg
+	wasm-pack build --target web --out-dir pkg
+	cp -r pkg/* www/pkg/
 	@touch $@
-www/build: www/src/*.ts www/index.html Makefile
-	cd www && npx tsc src/index.ts --outDir build --target es6 --module es2020
+www/build: ts/*.ts Makefile
+	@mkdir -p www/build
+	npx tsc ts/*.ts --outDir www/build --target es6 --module es2020
 	@touch $@
 
-tswatch: www/src/*.ts www/index.html Makefile
-	cd www && npx tsc src/index.ts --outDir build --target es6 --module es2020 --strict --checkJs --watch
+tswatch: ts/*.ts www/index.html Makefile
+	@mkdir -p www/build
+	npx tsc ts/*.ts --outDir www/build --target es6 --module es2020 --strict --checkJs --watch
