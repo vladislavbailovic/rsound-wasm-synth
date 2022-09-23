@@ -9,11 +9,21 @@ www/pkg: src/*.rs Cargo.toml Makefile
 	wasm-pack build --target web --out-dir pkg
 	cp -r pkg/* www/pkg/
 	@touch $@
-www/build: ts/*.ts Makefile node_modules
+www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
-	npx tsc ts/*.ts --outDir www/build --target es6 --module es2020
+	npx tsc ts/*.ts ts/*.tsx --outDir www/build --target es6 \
+		--module node16 \
+		--strict --checkJs \
+		--jsx preserve \
+		--lib es2015,dom
+	npx babel www/build/*.jsx --out-dir www/build/ --presets=@babel/preset-env
 	@touch $@
 
-tswatch: ts/*.ts www/index.html Makefile node_modules
+tswatch: ts/*.ts ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
-	npx tsc ts/*.ts --outDir www/build --target es6 --module es2020 --strict --checkJs --watch
+	npx tsc ts/*.ts ts/*.tsx --outDir www/build --target es6 \
+		--module node16 \
+		--strict --checkJs \
+		--jsx preserve \
+		--lib es2015,dom \
+		--watch
