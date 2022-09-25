@@ -1,5 +1,6 @@
 export interface WasmSynth {
 	draw: (tone: number, base: number, mods: Array<ModulatorData>) => Uint8Array
+	play: (tone: number, base: number, mods: Array<ModulatorData>) => Float32Array
 }
 
 export class ModulatorData {
