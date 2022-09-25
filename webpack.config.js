@@ -7,7 +7,7 @@ const path = require( 'path');
 
   return {
     devtool: isDevelopment && "cheap-module-source-map",
-    entry: "./build/site.jsx",
+    entry: "./build/site.js",
 	  mode: "development",
     output: {
       path: path.resolve(process.cwd(), "www"),

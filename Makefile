@@ -19,11 +19,13 @@ www/build: ts/*.tsx Makefile node_modules
 	npx webpack
 	@touch $@
 
-tswatch: ts/*.ts ts/*.tsx Makefile node_modules
-	@mkdir -p www/build
-	npx tsc ts/*.ts ts/*.tsx --outDir www/build --target es6 \
-		--module node16 \
+tswatch: ts/*.tsx Makefile node_modules package.json webpack.config.js
+	npx tsc ts/*.tsx --outDir build --target es6 \
+		--module commonjs \
+		--esModuleInterop true \
 		--strict --checkJs \
-		--jsx preserve \
-		--lib es2015,dom \
+		--jsx react \
 		--watch
+webpackwatch: build/*.js Makefile package.json webpack.config.js
+	npx webpack watch
+watch: ; ${MAKE} -j4 tswatch webpackwatch

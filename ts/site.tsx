@@ -119,9 +119,9 @@ const Link = ({ type, children }: { type: string, children: Array<JSX.Element> }
 			{ kind: 0, shape: 0, freq: 45 },
 		],
 	};
-const container = document.getElementById('interface');
-if (container) {
-	const root = createRoot(container);
-	root.render( <Interface synth={synth} />);
-}
+	const container = document.getElementById('interface');
+	if (container) {
+		const root = createRoot(container);
+		root.render( <Interface synth={synth} />);
+	}
 });
