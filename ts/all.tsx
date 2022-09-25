@@ -1,8 +1,8 @@
-	import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
 
-import('../pkg').then(async (wasm) => {
-	const wasmSynth = await wasm.default;
+interface WasmSynth {
+	draw: (tone: number, base: number, mods: Array<ModulatorData>) => Uint8Array
+}
 
 class ModulatorData {
 	kind: number = 0
@@ -15,8 +15,8 @@ class SynthData {
 	modulators: Array<ModulatorData> = []
 }
 
-const Interface = ({synth}: {synth: SynthData}) => (<>
-	<Synth type="chain" synth={ synth } />
+export const Interface = ({synth, wasmSynth}: {synth: SynthData, wasmSynth: WasmSynth}) => (<>
+	<Synth type="chain" synth={ synth } wasmSynth={wasmSynth} />
 	<Keyboard />
 </>);
 
@@ -26,7 +26,7 @@ const Display = ({ id, src }: { id?: string, src?: string }) => {
 	</div>;
 };
 
-const Synth = ({ type, synth }: { type: string, synth: SynthData }) => {
+const Synth = ({ type, synth, wasmSynth }: { type: string, synth: SynthData, wasmSynth: WasmSynth }) => {
 	const cls = ["synth"].concat([type]).join(" ");
 	const graph = wasmSynth.draw(synth.tone, 0, synth.modulators);
 	const blob = new Blob([graph], {type: "image/svg+xml"});
@@ -112,16 +112,3 @@ const Link = ({ type, children }: { type: string, children: Array<JSX.Element> }
 		</div>
 	</div>
 };
-
-	const synth = {
-		tone: 0,
-		modulators: [
-			{ kind: 0, shape: 0, freq: 45 },
-		],
-	};
-	const container = document.getElementById('interface');
-	if (container) {
-		const root = createRoot(container);
-		root.render( <Interface synth={synth} />);
-	}
-});

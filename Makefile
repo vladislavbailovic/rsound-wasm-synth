@@ -9,9 +9,9 @@ www/pkg: src/*.rs Cargo.toml Makefile
 	wasm-pack build --target bundler --out-dir pkg
 	cp -r pkg/* www/pkg/
 	@touch $@
-www/build: ts/*.tsx Makefile node_modules
+www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
-	npx tsc ts/*.tsx --outDir build --target es6 \
+	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
 		--strict --checkJs \
@@ -19,8 +19,8 @@ www/build: ts/*.tsx Makefile node_modules
 	npx webpack
 	@touch $@
 
-tswatch: ts/*.tsx Makefile node_modules package.json webpack.config.js
-	npx tsc ts/*.tsx --outDir build --target es6 \
+tswatch: ts/*.ts ts/*.tsx Makefile node_modules package.json webpack.config.js
+	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
 		--strict --checkJs \
