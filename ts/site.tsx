@@ -1,4 +1,8 @@
-import init, { play, draw, draw_lfo, draw_oscillator } from "../pkg/rsound_wasm_synth.js";
+	import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+import('../pkg').then(async (wasm) => {
+	const wasmSynth = await wasm.default;
 
 class ModulatorData {
 	kind: number = 0
@@ -24,14 +28,17 @@ const Display = ({ id, src }: { id?: string, src?: string }) => {
 
 const Synth = ({ type, synth }: { type: string, synth: SynthData }) => {
 	const cls = ["synth"].concat([type]).join(" ");
-	const graph = draw(synth.tone, 0, synth.modulators);
+	const graph = wasmSynth.draw(synth.tone, 0, synth.modulators);
 	const blob = new Blob([graph], {type: "image/svg+xml"});
 	const temp_url = window.URL.createObjectURL(blob);
-	return <div className={cls}>
+	return <>
 		<Display id="graph" src={temp_url} />
-		<SynthSource />
-		<Modulators />
-	</div>;
+
+		<div className={cls}>
+			<SynthSource />
+			<Modulators />
+		</div>
+	</>;
 };
 
 const Keyboard = () => (<div className="piano">
@@ -58,7 +65,7 @@ const SynthSource = () => {
 			</select>
 		</label>
 		<label>
-			<input type="numeric" value="440" />
+			<input type="numeric" defaultValue="440" />
 			<span>Hz</span>
 		</label>
 	</Link>
@@ -80,7 +87,7 @@ const Modulator = () => <Link type="modulator">
 		</select>
 	</label>
 	<label>
-		<input type="numeric" value="45" />
+		<input type="numeric" defaultValue="45" />
 		<span>Hz</span>
 	</label>
 </Link>
@@ -106,16 +113,15 @@ const Link = ({ type, children }: { type: string, children: Array<JSX.Element> }
 	</div>
 };
 
-init().then(res => {
 	const synth = {
 		tone: 0,
 		modulators: [
 			{ kind: 0, shape: 0, freq: 45 },
 		],
 	};
-	// @ts-expect-error
-	ReactDOM.render(
-		<Interface synth={synth} />,
-		document.getElementById('interface')
-	);
+const container = document.getElementById('interface');
+if (container) {
+	const root = createRoot(container);
+	root.render( <Interface synth={synth} />);
+}
 });

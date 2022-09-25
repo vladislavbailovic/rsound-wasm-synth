@@ -6,17 +6,17 @@ www: www/pkg www/build
 	cp index.html www/
 www/pkg: src/*.rs Cargo.toml Makefile
 	@mkdir -p www/pkg
-	wasm-pack build --target web --out-dir pkg
+	wasm-pack build --target bundler --out-dir pkg
 	cp -r pkg/* www/pkg/
 	@touch $@
-www/build: ts/*.ts ts/*.tsx Makefile node_modules
+www/build: ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
-	npx tsc ts/*.ts ts/*.tsx --outDir www/build --target es6 \
-		--module node16 \
+	npx tsc ts/*.tsx --outDir build --target es6 \
+		--module commonjs \
+		--esModuleInterop true \
 		--strict --checkJs \
-		--jsx preserve \
-		--lib es2015,dom
-	npx babel www/build/*.jsx --out-dir www/build/ --presets=@babel/preset-env
+		--jsx react
+	npx webpack
 	@touch $@
 
 tswatch: ts/*.ts ts/*.tsx Makefile node_modules
