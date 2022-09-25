@@ -1,32 +1,8 @@
 import React from 'react';
+import { Display } from '../display';
+import { WasmSynth, ModulatorData, SynthData } from '../data';
 
-interface WasmSynth {
-	draw: (tone: number, base: number, mods: Array<ModulatorData>) => Uint8Array
-}
-
-class ModulatorData {
-	kind: number = 0
-	shape: number = 0
-	freq: number = 0
-};
-
-class SynthData {
-	tone: number = 0
-	modulators: Array<ModulatorData> = []
-}
-
-export const Interface = ({synth, wasmSynth}: {synth: SynthData, wasmSynth: WasmSynth}) => (<>
-	<Synth type="chain" synth={ synth } wasmSynth={wasmSynth} />
-	<Keyboard />
-</>);
-
-const Display = ({ id, src }: { id?: string, src?: string }) => {
-	return <div className="display">
-		<img id={id} className="graph" src={src} />
-	</div>;
-};
-
-const Synth = ({ type, synth, wasmSynth }: { type: string, synth: SynthData, wasmSynth: WasmSynth }) => {
+export const Synth = ({ type, synth, wasmSynth }: { type: string, synth: SynthData, wasmSynth: WasmSynth }) => {
 	const cls = ["synth"].concat([type]).join(" ");
 	const graph = wasmSynth.draw(synth.tone, 0, synth.modulators);
 	const blob = new Blob([graph], {type: "image/svg+xml"});
@@ -41,20 +17,6 @@ const Synth = ({ type, synth, wasmSynth }: { type: string, synth: SynthData, was
 	</>;
 };
 
-const Keyboard = () => (<div className="piano">
-	<button className="key">C</button>
-	<button className="key black">Cis</button>
-	<button className="key offset">D</button>
-	<button className="key black">Dis</button>
-	<button className="key offset">E</button>
-	<button className="key">F</button>
-	<button className="key black">Fis</button>
-	<button className="key offset">G</button>
-	<button className="key black">Gis</button>
-	<button className="key offset">A</button>
-	<button className="key black">B</button>
-	<button className="key offset">H</button>
-</div>);
 
 const SynthSource = () => {
 	return <Link type="source">

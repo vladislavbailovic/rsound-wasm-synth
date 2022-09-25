@@ -2,7 +2,7 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {
 	Interface
-} from './all';
+} from './interface';
 
 import('../pkg').then(async (wasm) => {
 	const wasmSynth = await wasm.default;
