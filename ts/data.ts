@@ -1,6 +1,8 @@
+import { draw, play } from '../pkg/rsound_wasm_synth';
+
 export interface WasmSynth {
-	draw: (tone: number, base: number, mods: Array<ModulatorData>) => Uint8Array
-	play: (tone: number, base: number, mods: Array<ModulatorData>) => Float32Array
+	draw: typeof draw,
+	play: typeof play,
 }
 
 export class ModulatorData {
