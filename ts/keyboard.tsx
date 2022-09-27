@@ -31,6 +31,7 @@ export const Keyboard = ({ activateKey }: { activateKey: (tone: number) => void 
 	</div>;
 }
 
+// TODO: refactor?
 const KEY_NONE = -1;
 const KEY_C = 0;
 const KEY_CIS = 1;
@@ -44,9 +45,6 @@ const KEY_GIS = 8;
 const KEY_A = 9;
 const KEY_B = 10;
 const KEY_H = 11;
-
-const BLACK = [ KEY_CIS, KEY_DIS, KEY_FIS, KEY_GIS, KEY_B ];
-const OFFSET = BLACK.map(x => x+1);
 const KEYMAP: Record<string, number> = {
 	'z': KEY_C,
 	's': KEY_CIS,
@@ -62,6 +60,10 @@ const KEYMAP: Record<string, number> = {
 	'm': KEY_H,
 };
 
+const BLACK = [ KEY_CIS, KEY_DIS, KEY_FIS, KEY_GIS, KEY_B ];
+const OFFSET = BLACK.map(x => x+1);
+
+// TODO: make toggleable?
 const keypressListener = (activate: (e: any) => void, deactivate?: (e: any) => void) => {
 	const activateHandler = React.useRef<(e: any) => void>();
 	const deactivateHandler = React.useRef<(e: any) => void>();
