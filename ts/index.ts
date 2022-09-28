@@ -3,48 +3,12 @@ import {createRoot} from 'react-dom/client';
 import {
 	Interface
 } from './interface';
-import { WasmSynth, SynthData } from './data';
-
-class Player {
-	audioCtx: AudioContext
-	gainNode: GainNode
-	bufferNode: AudioBufferSourceNode | null = null
-	synthData: SynthData
-	playSynth: WasmSynth["play"]
-
-	constructor(ctx: AudioContext, play: WasmSynth["play"], data: SynthData) {
-		this.audioCtx = ctx;
-		this.playSynth = play;
-		this.gainNode = this.audioCtx.createGain();
-		this.gainNode.gain.value = 0.5;
-		this.gainNode.connect(this.audioCtx.destination);
-		this.synthData = data;
-
-		this.play = this.play.bind(this);
-	}
-
-	play(tone: number) {
-		this.audioCtx.resume().then(() => {
-			if (this.bufferNode) {
-				this.bufferNode.stop();
-			}
-			const result = this.playSynth(tone, 0, this.synthData.modulators);
-			const buffer = this.audioCtx.createBuffer(1, result.length, 44100);
-			buffer.copyToChannel(result, 0);
-
-			this.bufferNode = this.audioCtx.createBufferSource();
-			this.bufferNode.buffer = buffer;
-			this.bufferNode.connect(this.gainNode);
-
-			this.bufferNode.start(0);
-		});
-	}
-}
+import { SynthData } from './data';
+import Player from './player';
 
 
 import init from '../pkg/rsound_wasm_synth';
-import * as wasmSynth from '../pkg/rsound_wasm_synth';
-import {play, Octave} from '../pkg/rsound_wasm_synth';
+import {play} from '../pkg/rsound_wasm_synth';
 init().then(() => {
 	const container = document.getElementById('interface');
 
@@ -61,6 +25,6 @@ init().then(() => {
 
 	if (container) {
 		const root = createRoot(container);
-		root.render(Interface({ synth, wasmSynth, play: player.play }));
+		root.render(Interface({ synth, play: player.play }));
 	}
 });
