@@ -24,7 +24,6 @@ class Player {
 	}
 
 	play(tone: number) {
-		console.log(this);
 		this.audioCtx.resume().then(() => {
 			if (this.bufferNode) {
 				this.bufferNode.stop();
@@ -43,12 +42,13 @@ class Player {
 }
 
 
-import('../pkg').then(async (wasm) => {
-	const wasmSynth = await wasm.default;
+import init from '../pkg/rsound_wasm_synth';
+import * as wasmSynth from '../pkg/rsound_wasm_synth';
+import {play, Octave} from '../pkg/rsound_wasm_synth';
+init().then(() => {
 	const container = document.getElementById('interface');
 
 	const audioCtx = new window.AudioContext();
-
 
 	const synth = {
 		tone: 0,
@@ -57,7 +57,7 @@ import('../pkg').then(async (wasm) => {
 		],
 	};
 
-	const player = new Player(audioCtx, wasmSynth.play, synth);
+	const player = new Player(audioCtx, play, synth);
 
 	if (container) {
 		const root = createRoot(container);

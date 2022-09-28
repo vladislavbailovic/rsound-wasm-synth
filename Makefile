@@ -6,7 +6,7 @@ www: www/pkg www/build
 	cp index.html www/
 www/pkg: src/*.rs Cargo.toml Makefile
 	@mkdir -p www/pkg
-	wasm-pack build --target bundler --out-dir pkg
+	wasm-pack build --target web --out-dir pkg
 	cp -r pkg/* www/pkg/
 	@touch $@
 www/build: ts/*.ts ts/*.tsx Makefile node_modules

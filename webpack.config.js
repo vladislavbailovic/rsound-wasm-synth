@@ -22,7 +22,7 @@ const path = require( 'path');
 				  use: {
 					  loader: "babel-loader"
 				  }
-			  }
+			  },
 		  ],
 	  },
 	  resolve: {
