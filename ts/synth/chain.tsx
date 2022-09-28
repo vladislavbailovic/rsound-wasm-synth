@@ -1,10 +1,11 @@
 import React from 'react';
 import { Display } from '../display';
-import { WasmSynth, ModulatorData, SynthData } from '../data';
+import { ModulatorData, SynthData } from '../data';
+import {draw} from '../../pkg/rsound_wasm_synth';
 
-export const Synth = ({ type, synth, wasmSynth }: { type: string, synth: SynthData, wasmSynth: WasmSynth }) => {
+export const Synth = ({ type, synth }: { type: string, synth: SynthData }) => {
 	const cls = ["synth"].concat([type]).join(" ");
-	const graph = wasmSynth.draw(synth.tone, 0, synth.modulators);
+	const graph = draw(synth.tone, 0, synth.modulators);
 	const blob = new Blob([graph], {type: "image/svg+xml"});
 	const temp_url = window.URL.createObjectURL(blob);
 	return <>
