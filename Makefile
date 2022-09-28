@@ -11,6 +11,8 @@ www/pkg: src/*.rs Cargo.toml Makefile
 	@touch $@
 www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
+	npx prettier ts webpack.config.js .eslintrc.js -w
+	npx eslint ts webpack.config.js .eslintrc.js --fix
 	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
@@ -20,6 +22,8 @@ www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	@touch $@
 
 tswatch: ts/*.ts ts/*.tsx Makefile node_modules package.json webpack.config.js
+	npx prettier ts webpack.config.js .eslintrc.js -w
+	npx eslint ts webpack.config.js .eslintrc.js --fix
 	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
