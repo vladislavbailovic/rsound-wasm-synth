@@ -7,7 +7,7 @@ export const Interface = ({ synth }: { synth: SynthData }): JSX.Element => {
   return (
     <>
       <Synth type="chain" synth={synth} />
-      <Keyboard />
+      <Keyboard synth={synth} />
     </>
   );
 };
