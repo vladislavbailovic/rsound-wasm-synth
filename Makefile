@@ -1,14 +1,18 @@
+PYTHON=$(shell command -v python || echo "python3")
+
 run: www node_modules
-	cd www && pwd && python -m http.server 6660
+	cd www && pwd && $(PYTHON) -m http.server 6660
+
 node_modules: package.json package-lock.json
 	npm i
-www: www/pkg www/build
+
+www: pkg www/build
 	cp index.html www/
-www/pkg: src/*.rs Cargo.toml Makefile
-	@mkdir -p www/pkg
+
+pkg: src/*.rs Cargo.toml Makefile
 	wasm-pack build --target web --out-dir pkg
-	cp -r pkg/* www/pkg/
 	@touch $@
+
 www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	@mkdir -p www/build
 	npx prettier ts webpack.config.js .eslintrc.js -w
