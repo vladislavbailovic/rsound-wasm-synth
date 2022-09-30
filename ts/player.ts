@@ -1,22 +1,21 @@
 import { SynthData } from './data';
-import { play as playCback } from '../pkg/rsound_wasm_synth';
+import { play } from '../pkg/rsound_wasm_synth';
 
-export default class Player {
+export class Player {
   audioCtx: AudioContext;
   gainNode: GainNode;
   bufferNode: AudioBufferSourceNode | null = null;
-  synthData: SynthData;
-  playSynth: typeof playCback;
+  synthData: SynthData | null = null;
 
-  constructor (ctx: AudioContext, play: typeof playCback, data: SynthData) {
-    this.audioCtx = ctx;
-    this.playSynth = play;
+  constructor (data?: SynthData | null) {
+    this.audioCtx = new window.AudioContext();
     this.gainNode = this.audioCtx.createGain();
     this.gainNode.gain.value = 0.5;
     this.gainNode.connect(this.audioCtx.destination);
-    this.synthData = data;
-
-    this.play = this.play.bind(this);
+    if (data != null) {
+      this.synthData = data;
+    }
+    console.log('constructed');
   }
 
   play (tone: number): void {
@@ -26,7 +25,9 @@ export default class Player {
         if (this.bufferNode != null) {
           this.bufferNode.stop();
         }
-        const result = this.playSynth(tone, 0, this.synthData.modulators);
+        const modulators =
+          this.synthData != null ? this.synthData.modulators : [];
+        const result = play(tone, 0, modulators);
         const buffer = this.audioCtx.createBuffer(1, result.length, 44100);
         buffer.copyToChannel(result, 0);
 

@@ -1,5 +1,8 @@
 import React from 'react';
 import { PitchClass } from '../pkg/rsound_wasm_synth';
+import { Player } from './player';
+
+const _player = new Player();
 
 const KEYMAP: Record<string, number> = {
   z: PitchClass.C,
@@ -25,11 +28,7 @@ const BLACK = [
 ];
 const OFFSET = BLACK.map((x) => Number(x) + 1);
 
-export const Keyboard = ({
-  activateKey
-}: {
-  activateKey: (tone: number) => void
-}): JSX.Element => {
+export const Keyboard = (): JSX.Element => {
   const [activeKey, setActiveKey] = React.useState<PitchClass | null>(null);
   keypressListener(
     (e: any) => {
@@ -38,7 +37,7 @@ export const Keyboard = ({
         return;
       }
       setActiveKey(KEYMAP[event.key]);
-      activateKey(KEYMAP[event.key]);
+      _player.play(KEYMAP[event.key]);
     },
     (e: any) => {
       setActiveKey(-1);
@@ -55,7 +54,7 @@ export const Keyboard = ({
               key={idx}
               name={key}
               idx={Number(val)}
-              activate={activateKey}
+              activate={_player.play}
               active={activeKey}
             />
           );
