@@ -1,7 +1,7 @@
 import React from 'react';
 import { Display } from '../display';
-import { SynthData } from '../data';
-import { draw } from '../../pkg/rsound_wasm_synth';
+import { SynthData, ModulatorData } from '../data';
+import { draw, draw_lfo } from '../../pkg/rsound_wasm_synth';
 
 export const Synth = ({
   type,
@@ -20,7 +20,7 @@ export const Synth = ({
 
       <div className={cls}>
         <SynthSource />
-        <Modulators />
+        <Modulators modulators={synth.modulators} />
       </div>
     </>
   );
@@ -43,36 +43,53 @@ const SynthSource = (): JSX.Element => {
   );
 };
 
-const Modulators = (): JSX.Element => (
+const Modulators = ({
+  modulators
+}: {
+  modulators: ModulatorData[]
+}): JSX.Element => (
   <>
-    <Modulator />
+    {modulators.map((mod, idx) => (
+      <Modulator key={idx} modulator={mod} />
+    ))}
   </>
 );
 
-const Modulator = (): JSX.Element => (
-  <Link type="modulator">
-    <input type="hidden" value="1" />
-    <label>
-      <span className="kind"></span>
-      <select>
-        <option>Sine</option>
-        <option>Square</option>
-        <option>Triangle</option>
-        <option>Saw</option>
-      </select>
-    </label>
-    <label>
-      <input type="numeric" defaultValue="45" />
-      <span>Hz</span>
-    </label>
-  </Link>
-);
+const Modulator = ({
+  modulator
+}: {
+  modulator: ModulatorData
+}): JSX.Element => {
+  const graph = draw_lfo(modulator.shape, modulator.freq);
+  const blob = new Blob([graph], { type: 'image/svg+xml' });
+  const tempUrl = window.URL.createObjectURL(blob);
+  return (
+    <Link type="modulator" graph={tempUrl}>
+      <input type="hidden" value="1" />
+      <label>
+        <span className="kind"></span>
+        <select>
+          <option>Sine</option>
+          <option>Square</option>
+          <option>Triangle</option>
+          <option>Saw</option>
+        </select>
+      </label>
+      <label>
+        <input type="numeric" defaultValue="45" />
+        <span>Hz</span>
+      </label>
+    </Link>
+  );
+};
 
 const Link = ({
   type,
+  graph,
   children
 }: {
   type: string
+  graph?: string | undefined
   children: JSX.Element[]
 }): JSX.Element => {
   const cls = ['link'].concat([type]).join(' ');
@@ -83,7 +100,7 @@ const Link = ({
   return (
     <div className={cls}>
       <div className="shape">
-        <Display />
+        <Display src={graph} />
       </div>
       <div className="params">{children}</div>
       <div className="next">
