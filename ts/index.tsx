@@ -1,3 +1,4 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Interface } from './interface';
 
@@ -12,7 +13,7 @@ init()
 
     if (container != null) {
       const root = createRoot(container);
-      root.render(Interface({ synth }));
+      root.render(<Interface synth={synth} />);
     }
   })
   .catch((e) => console.error(e));

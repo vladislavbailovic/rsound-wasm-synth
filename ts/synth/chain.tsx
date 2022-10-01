@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Display } from '../display';
 import { SynthData, ModulatorData } from '../data';
 import { draw, draw_lfo } from '../../pkg/rsound_wasm_synth';
@@ -10,6 +10,9 @@ export const Synth = ({
   type: string
   synth: SynthData
 }): JSX.Element => {
+  const [state, setState] = useState(0);
+  console.log(state, setState);
+
   const cls = ['synth'].concat([type]).join(' ');
   const graph = draw(synth.tone, 0, synth.modulators);
   const blob = new Blob([graph], { type: 'image/svg+xml' });
