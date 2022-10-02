@@ -1,10 +1,7 @@
 import React, { useContext } from 'react';
 import { PitchClass } from '../pkg/rsound_wasm_synth';
-import { SynthDataContext } from './data';
-import { Player } from './player';
+import { PlayerContext } from './player';
 import './keyboard.css';
-
-const _player = new Player();
 
 const KEYMAP: Record<string, number> = {
   z: PitchClass.C,
@@ -31,9 +28,8 @@ const BLACK = [
 const OFFSET = BLACK.map((x) => Number(x) + 1);
 
 export const Keyboard = (): JSX.Element => {
-  const synthCtx = useContext(SynthDataContext);
+  const player = useContext(PlayerContext);
   const [activeKey, setActiveKey] = React.useState<PitchClass | null>(null);
-  _player.set_synth(synthCtx.data);
   keypressListener(
     (e: any) => {
       const event = e as React.KeyboardEvent;
@@ -41,7 +37,7 @@ export const Keyboard = (): JSX.Element => {
         return;
       }
       setActiveKey(KEYMAP[event.key]);
-      _player.play(KEYMAP[event.key]);
+      player.play(KEYMAP[event.key]);
     },
     (e: any) => {
       setActiveKey(-1);
@@ -58,7 +54,7 @@ export const Keyboard = (): JSX.Element => {
               key={idx}
               name={key}
               idx={Number(val)}
-              activate={_player.play}
+              activate={player.play}
               active={activeKey}
             />
           );

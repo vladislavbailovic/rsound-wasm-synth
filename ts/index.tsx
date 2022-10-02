@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Interface } from './interface';
 import { SynthDataContext, SynthData } from './data';
+import { Player, PlayerContext } from './player';
 
 import init from '../pkg/rsound_wasm_synth';
 
@@ -10,7 +11,7 @@ const synth = {
   modulators: [{ kind: 0, shape: 0, freq: 45 }]
 };
 
-const SynthContextProvider = ({
+const ContextProvider = ({
   children
 }: {
   children: JSX.Element
@@ -19,7 +20,9 @@ const SynthContextProvider = ({
 
   return (
     <SynthDataContext.Provider value={{ data, setData }}>
-      {children}
+      <PlayerContext.Provider value={new Player(data)}>
+        {children}
+      </PlayerContext.Provider>
     </SynthDataContext.Provider>
   );
 };
@@ -30,9 +33,9 @@ init()
     if (container != null) {
       const root = createRoot(container);
       root.render(
-        <SynthContextProvider>
+        <ContextProvider>
           <Interface />
-        </SynthContextProvider>
+        </ContextProvider>
       );
     }
   })

@@ -1,3 +1,4 @@
+import { createContext } from 'react';
 import { SynthData } from './data';
 import { play } from '../pkg/rsound_wasm_synth';
 
@@ -64,3 +65,5 @@ export class Player {
       .catch((e) => console.error(e));
   }
 }
+
+export const PlayerContext = createContext<Player>(new Player());
