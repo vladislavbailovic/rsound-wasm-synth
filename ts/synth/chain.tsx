@@ -1,7 +1,12 @@
 import React, { useContext } from 'react';
 import { Display } from '../display';
 import { SynthDataContext, ModulatorData } from '../data';
-import { draw, draw_lfo } from '../../pkg/rsound_wasm_synth';
+import { draw, draw_lfo, Oscillator } from '../../pkg/rsound_wasm_synth';
+
+enum LinkType {
+  Source = 1,
+  Modulator,
+}
 
 export const Synth = ({ type }: { type: string }): JSX.Element => {
   const synthCtx = useContext(SynthDataContext);
@@ -24,7 +29,7 @@ export const Synth = ({ type }: { type: string }): JSX.Element => {
 
 const SynthSource = (): JSX.Element => {
   return (
-    <Link type="source">
+    <Link type={LinkType.Source}>
       <label>
         <select>
           <option>Sine</option>
@@ -80,15 +85,24 @@ const Modulator = ({
   };
 
   return (
-    <Link type="modulator" graph={tempUrl} del={del} idx={idx}>
+    <Link type={LinkType.Modulator} graph={tempUrl} del={del} idx={idx}>
       <input type="hidden" value="1" />
       <label>
         <span className="kind"></span>
-        <select onChange={(e) => changeShape(Number(e.target.value))} value={modulator.shape} >
-          <option value="0">Sine</option>
-          <option value="1">Square</option>
-          <option value="2">Triangle</option>
-          <option value="3">Saw</option>
+        <select
+          onChange={(e) => changeShape(Number(e.target.value))}
+          value={modulator.shape}
+        >
+          {Object.entries(Oscillator)
+            .filter(([key, val]) => !isNaN(Number(val)))
+            .map(([key, val]) => {
+              const idx = `${key}-${Number(val)}`;
+              return (
+                <option key={idx} value={Number(val)}>
+                  {key}
+                </option>
+              );
+            })}
         </select>
       </label>
       <label>
@@ -110,15 +124,16 @@ const Link = ({
   del,
   children
 }: {
-  type: string
+  type: LinkType
   idx?: number | null
   graph?: string | undefined
   del?: null | (() => void)
   children: JSX.Element[]
 }): JSX.Element => {
-  const cls = ['link'].concat([type]).join(' ');
+  const typeClass = type === LinkType.Source ? 'synth' : 'modulator';
+  const cls = ['link'].concat([typeClass]).join(' ');
   const synthCtx = useContext(SynthDataContext);
-	let nextPosition = idx || 0;
+  const nextPosition = idx == null ? 0 : idx;
 
   const add = (): void => {
     const modulators = [...synthCtx.data.modulators];
@@ -127,8 +142,9 @@ const Link = ({
   };
 
   let kill = null;
-  if (type === 'modulator') {
-    const delHandler = (del != null) ? (e: React.UIEvent): void => del() : undefined;
+  if (type === LinkType.Modulator) {
+    const delHandler =
+      del != null ? (e: React.UIEvent): void => del() : undefined;
     kill = (
       <button onClick={delHandler} className="kill">
         [x]
