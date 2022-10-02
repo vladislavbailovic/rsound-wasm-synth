@@ -1,3 +1,6 @@
+CSSFILES=$(shell find ts -type f -name '*.css')
+TSFILES=$(shell find ts -type f -name '*.ts')
+TSXFILES=$(shell find ts -type f -name '*.tsx')
 PYTHON=$(shell command -v python || echo "python3")
 
 run: www node_modules
@@ -13,7 +16,7 @@ pkg: src/*.rs Cargo.toml Makefile
 	wasm-pack build --target web --out-dir pkg
 	@touch $@
 
-www/build: ts/*.ts ts/*.tsx Makefile node_modules
+www/build: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules
 	@mkdir -p www/build
 	npx prettier ts webpack.config.js .eslintrc.js -w
 	npx eslint ts webpack.config.js .eslintrc.js --fix
@@ -26,7 +29,7 @@ www/build: ts/*.ts ts/*.tsx Makefile node_modules
 	npx webpack
 	@touch $@
 
-tswatch: ts/*.ts ts/*.tsx Makefile node_modules package.json webpack.config.js
+tswatch: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules package.json webpack.config.js
 	npx prettier ts webpack.config.js .eslintrc.js -w
 	npx eslint ts webpack.config.js .eslintrc.js --fix
 	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
