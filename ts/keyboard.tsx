@@ -36,6 +36,9 @@ export const Keyboard = (): JSX.Element => {
       if (!Object.keys(KEYMAP).includes(event.key)) {
         return;
       }
+      if (event.repeat !== false) {
+        return;
+      }
       setActiveKey(KEYMAP[event.key]);
       player.play(KEYMAP[event.key]);
     },
