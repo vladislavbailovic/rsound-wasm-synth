@@ -1,14 +1,34 @@
 import { createContext } from 'react';
+import {
+  ModulatorOp,
+  ModulatorKind,
+  Oscillator
+} from '../pkg/rsound_wasm_synth';
 
 export class ModulatorData {
-  kind: ModulatorKind = ModulatorKind.Add;
-  shape: number = 0;
+  op: ModulatorOp = ModulatorOp.Add;
+  kind: ModulatorKind = ModulatorKind.LFO;
+  shape: Oscillator = Oscillator.Sine;
   freq: number = 0;
-}
 
-export enum ModulatorKind {
-  Add = 0,
-  Sub,
+  static from ({
+    op,
+    kind,
+    shape,
+    freq
+  }: {
+    op?: ModulatorOp
+    kind?: ModulatorKind
+    shape?: Oscillator
+    freq?: number
+  }): ModulatorData {
+    const data = new ModulatorData();
+    if (kind !== undefined) data.kind = kind;
+    if (shape !== undefined) data.shape = shape;
+    if (op !== undefined) data.op = op;
+    if (freq !== undefined) data.freq = freq;
+    return data;
+  }
 }
 
 export class SynthData {

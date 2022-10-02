@@ -1,5 +1,8 @@
 use wasm_bindgen::prelude::*;
 
+mod modulator;
+pub use modulator::*;
+
 // #[wasm_bindgen]
 // extern {
 //     pub fn alert(s: &str);
@@ -10,14 +13,6 @@ use instrument::generator::Signal;
 use instrument::*;
 use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
-
-use serde::{Serialize, Deserialize};
-#[derive(Serialize, Deserialize)]
-pub struct Modulator {
-    pub kind: i32,
-    pub shape: i32,
-    pub freq: i32,
-}
 
 #[wasm_bindgen]
 pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
@@ -85,21 +80,45 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
         _ => generator::chain::Chain::new(Oscillator::Sine)
     };
     for res in mods {
-        let modulator: Modulator = serde_wasm_bindgen::from_value(res).unwrap();
-        let m = match modulator.shape {
-            1 => lfo::LFO::square(modulator.freq as f64),
-            2 => lfo::LFO::triangle(modulator.freq as f64),
-            3 => lfo::LFO::saw(modulator.freq as f64),
-            _ => lfo::LFO::sine(modulator.freq as f64),
-        };
-        match modulator.kind {
-            0 => chain.add(m),
-            _ => chain.sub(m),
+        let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(res).unwrap();
+        // let m = match modulator.shape.into() {
+        //     Oscillator::Square => lfo::LFO::square(modulator.freq as f64),
+        //     Oscillator::Triangle => lfo::LFO::triangle(modulator.freq as f64),
+        //     Oscillator::Saw => lfo::LFO::saw(modulator.freq as f64),
+        //     Oscillator::Sine => lfo::LFO::sine(modulator.freq as f64),
+        // };
+        match modulator.op.into() {
+            ModulatorOp::Add => match modulator.kind.into() {
+                ModulatorKind::LFO => chain.add(get_lfo(modulator)),
+                ModulatorKind::ELFO => chain.add(get_elfo(modulator)),
+            },
+            ModulatorOp::Sub => match modulator.kind.into() {
+                ModulatorKind::LFO => chain.sub(get_lfo(modulator)),
+                ModulatorKind::ELFO => chain.sub(get_elfo(modulator)),
+            }
         };
     }
 
     let synth = Instrument::new(chain, envelope);
     synth.play(90.0, n, 1.0)
+}
+
+fn get_lfo(x: ModulatorRawData) -> lfo::LFO {
+    match x.kind.into() {
+        Oscillator::Sine => lfo::LFO::sine(x.freq as f64),
+        Oscillator::Square => lfo::LFO::square(x.freq as f64),
+        Oscillator::Triangle => lfo::LFO::triangle(x.freq as f64),
+        Oscillator::Saw => lfo::LFO::saw(x.freq as f64),
+    }
+}
+
+fn get_elfo(x: ModulatorRawData) -> lfo::ELFO {
+    match x.kind.into() {
+        Oscillator::Sine => lfo::ELFO::sine(x.freq as f64),
+        Oscillator::Square => lfo::ELFO::square(x.freq as f64),
+        Oscillator::Triangle => lfo::ELFO::triangle(x.freq as f64),
+        Oscillator::Saw => lfo::ELFO::saw(x.freq as f64),
+    }
 }
 
 

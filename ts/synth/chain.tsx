@@ -1,7 +1,13 @@
 import React, { useContext } from 'react';
 import { Display } from '../display';
-import { SynthDataContext, ModulatorData, ModulatorKind } from '../data';
-import { draw, draw_lfo, Oscillator } from '../../pkg/rsound_wasm_synth';
+import { SynthDataContext, ModulatorData } from '../data';
+import {
+  draw,
+  draw_lfo,
+  Oscillator,
+  ModulatorKind,
+  ModulatorOp
+} from '../../pkg/rsound_wasm_synth';
 import './chain.css';
 
 enum LinkType {
@@ -68,7 +74,7 @@ const Modulator = ({
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
 
-  const operation = ModulatorKind[modulator.kind];
+  const operation = ModulatorOp[modulator.kind];
 
   const synthCtx = useContext(SynthDataContext);
   const del = (): void => {
@@ -81,7 +87,7 @@ const Modulator = ({
     modulators[idx].freq = hz;
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
-  const changeShape = (shape: number): void => {
+  const changeShape = (shape: Oscillator): void => {
     const modulators = [...synthCtx.data.modulators];
     modulators[idx].shape = shape;
     synthCtx.setData({ ...synthCtx.data, modulators });
@@ -144,15 +150,20 @@ const Link = ({
   const synthCtx = useContext(SynthDataContext);
   const nextPosition = idx == null ? 0 : idx;
 
-  const injectModulator = (kind: ModulatorKind): void => {
+  const injectModulator = (op: ModulatorOp, kind: ModulatorKind): void => {
     const modulators = [...synthCtx.data.modulators];
-    const mod = new ModulatorData();
-    mod.kind = kind;
+    const mod = ModulatorData.from({ op, kind });
     modulators.splice(nextPosition + 1, 0, mod);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
-  const add = (): void => injectModulator(ModulatorKind.Add);
-  const sub = (): void => injectModulator(ModulatorKind.Sub);
+  const addLfo = (): void =>
+    injectModulator(ModulatorOp.Add, ModulatorKind.LFO);
+  const subLfo = (): void =>
+    injectModulator(ModulatorOp.Sub, ModulatorKind.LFO);
+  const addElfo = (): void =>
+    injectModulator(ModulatorOp.Add, ModulatorKind.ELFO);
+  const subElfo = (): void =>
+    injectModulator(ModulatorOp.Sub, ModulatorKind.ELFO);
 
   let kill = null;
   if (type === LinkType.Modulator) {
@@ -180,11 +191,17 @@ const Link = ({
       <div className="params">{children}</div>
       <div className="next">
         {kill}
-        <button className="add" onClick={(e) => add()}>
-          Add
+        <button className="add" onClick={(e) => addLfo()}>
+          Add LFO
         </button>
-        <button className="sub" onClick={(e) => sub()}>
-          Sub
+        <button className="add" onClick={(e) => addElfo()}>
+          Add ELFO
+        </button>
+        <button className="sub" onClick={(e) => subLfo()}>
+          Sub LFO
+        </button>
+        <button className="sub" onClick={(e) => subElfo()}>
+          Sub ELFO
         </button>
       </div>
     </div>

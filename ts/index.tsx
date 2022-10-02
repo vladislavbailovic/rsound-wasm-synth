@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Interface } from './interface';
-import { SynthDataContext, SynthData } from './data';
+import { SynthDataContext, SynthData, ModulatorData } from './data';
 import { Player, PlayerContext } from './player';
 
 import init from '../pkg/rsound_wasm_synth';
-
-const synth = {
-  tone: 0,
-  modulators: [{ kind: 0, shape: 0, freq: 45 }]
-};
 
 const ContextProvider = ({
   children
 }: {
   children: JSX.Element
 }): JSX.Element => {
+  const synth = {
+    tone: 0,
+    modulators: [new ModulatorData()]
+  };
   const [data, setData] = useState<SynthData>(synth);
 
   return (
