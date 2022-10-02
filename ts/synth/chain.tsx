@@ -142,11 +142,15 @@ const Link = ({
   const synthCtx = useContext(SynthDataContext);
   const nextPosition = idx == null ? 0 : idx;
 
-  const add = (): void => {
+  const injectModulator = (kind: ModulatorKind): void => {
     const modulators = [...synthCtx.data.modulators];
-    modulators.splice(nextPosition, 0, new ModulatorData());
+    const mod = new ModulatorData();
+    mod.kind = kind;
+    modulators.splice(nextPosition + 1, 0, mod);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
+  const add = (): void => injectModulator(ModulatorKind.Add);
+  const sub = (): void => injectModulator(ModulatorKind.Sub);
 
   let kill = null;
   if (type === LinkType.Modulator) {
@@ -177,7 +181,7 @@ const Link = ({
         <button className="add" onClick={(e) => add()}>
           Add
         </button>
-        <button className="sub" onClick={(e) => add()}>
+        <button className="sub" onClick={(e) => sub()}>
           Sub
         </button>
       </div>
