@@ -22,6 +22,7 @@ www/build: ts/*.ts ts/*.tsx Makefile node_modules
 		--esModuleInterop true \
 		--strict --checkJs \
 		--jsx react
+	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
 	npx webpack
 	@touch $@
 
@@ -34,6 +35,7 @@ tswatch: ts/*.ts ts/*.tsx Makefile node_modules package.json webpack.config.js
 		--strict --checkJs \
 		--jsx react \
 		--watch
+	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
 webpackwatch: build/*.js Makefile package.json webpack.config.js
 	npx webpack watch
 watch: ; ${MAKE} -j4 tswatch webpackwatch

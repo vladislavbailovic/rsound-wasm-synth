@@ -1,0 +1,24 @@
+.synth.chain {
+  display: flex;
+}
+.synth .link {
+  display: flex;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #aaa;
+}
+.synth .link .shape {
+  display: flex;
+  flex-direction: column;
+}
+.synth .link fieldset title {
+  display: block;
+}
+.synth .link .shape .params label {
+  display: block;
+}
+.synth .link .next {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

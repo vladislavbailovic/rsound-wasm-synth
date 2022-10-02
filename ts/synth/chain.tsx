@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Display } from '../display';
 import { SynthDataContext, ModulatorData, ModulatorKind } from '../data';
 import { draw, draw_lfo, Oscillator } from '../../pkg/rsound_wasm_synth';
+import './chain.css';
 
 enum LinkType {
   Source = 1,
