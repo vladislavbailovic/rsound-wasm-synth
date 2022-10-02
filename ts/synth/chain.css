@@ -1,6 +1,15 @@
 .synth.chain {
   display: flex;
 }
+
+.link.source {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  margin: 10px 0;
+}
+
 .synth .link {
   display: flex;
   margin: 5px;
@@ -13,6 +22,15 @@
 }
 .synth .link fieldset title {
   display: block;
+}
+.synth .link .params {
+  display: flex;
+}
+.synth .link .params fieldset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 0;
 }
 .synth .link .params label {
   display: block;

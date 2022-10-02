@@ -19,9 +19,9 @@ export const Synth = ({ type }: { type: string }): JSX.Element => {
   return (
     <>
       <Display id="graph" src={tempUrl} />
+      <SynthSource />
 
       <div className={cls}>
-        <SynthSource />
         <Modulators modulators={synthCtx.data.modulators} />
       </div>
     </>
@@ -137,7 +137,7 @@ const Link = ({
   del?: null | (() => void)
   children: JSX.Element | JSX.Element[]
 }): JSX.Element => {
-  const typeClass = type === LinkType.Source ? 'synth' : 'modulator';
+  const typeClass = type === LinkType.Source ? 'source' : 'modulator';
   const cls = ['link'].concat([typeClass]).join(' ');
   const synthCtx = useContext(SynthDataContext);
   const nextPosition = idx == null ? 0 : idx;
@@ -159,11 +159,18 @@ const Link = ({
     );
   }
 
-  return (
-    <div className={cls}>
+  let shape = null;
+  if (type === LinkType.Modulator) {
+    shape = (
       <div className="shape">
         <Display src={graph} />
       </div>
+    );
+  }
+
+  return (
+    <div className={cls}>
+      {shape}
       <div className="params">{children}</div>
       <div className="next">
         {kill}
