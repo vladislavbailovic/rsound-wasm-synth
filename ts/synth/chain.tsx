@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { Display } from '../display';
-import { SynthData, ModulatorData } from '../data';
+import { SynthDataContext, ModulatorData } from '../data';
 import { draw, draw_lfo } from '../../pkg/rsound_wasm_synth';
 
-export const Synth = ({
-  type,
-  synth
-}: {
-  type: string
-  synth: SynthData
-}): JSX.Element => {
-  const [state, setState] = useState(0);
-  console.log(state, setState);
+export const Synth = ({ type }: { type: string }): JSX.Element => {
+  const synthCtx = useContext(SynthDataContext);
 
   const cls = ['synth'].concat([type]).join(' ');
-  const graph = draw(synth.tone, 0, synth.modulators);
+  const graph = draw(synthCtx.data.tone, 0, synthCtx.data.modulators);
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
   return (
@@ -23,7 +16,7 @@ export const Synth = ({
 
       <div className={cls}>
         <SynthSource />
-        <Modulators modulators={synth.modulators} />
+        <Modulators modulators={synthCtx.data.modulators} />
       </div>
     </>
   );

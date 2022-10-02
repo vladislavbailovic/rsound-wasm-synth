@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { PitchClass } from '../pkg/rsound_wasm_synth';
-import { SynthData } from './data';
+import { SynthDataContext } from './data';
 import { Player } from './player';
 
 const _player = new Player();
@@ -29,9 +29,10 @@ const BLACK = [
 ];
 const OFFSET = BLACK.map((x) => Number(x) + 1);
 
-export const Keyboard = ({ synth }: { synth: SynthData }): JSX.Element => {
+export const Keyboard = (): JSX.Element => {
+  const synthCtx = useContext(SynthDataContext);
   const [activeKey, setActiveKey] = React.useState<PitchClass | null>(null);
-  _player.set_synth(synth);
+  _player.set_synth(synthCtx.data);
   keypressListener(
     (e: any) => {
       const event = e as React.KeyboardEvent;
