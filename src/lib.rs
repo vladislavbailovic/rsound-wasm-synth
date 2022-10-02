@@ -93,7 +93,7 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
             _ => lfo::LFO::sine(modulator.freq as f64),
         };
         match modulator.kind {
-            1 => chain.add(m),
+            0 => chain.add(m),
             _ => chain.sub(m),
         };
     }

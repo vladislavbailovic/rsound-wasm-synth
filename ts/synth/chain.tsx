@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Display } from '../display';
-import { SynthDataContext, ModulatorData } from '../data';
+import { SynthDataContext, ModulatorData, ModulatorKind } from '../data';
 import { draw, draw_lfo, Oscillator } from '../../pkg/rsound_wasm_synth';
 
 enum LinkType {
@@ -67,6 +67,8 @@ const Modulator = ({
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
 
+  const operation = ModulatorKind[modulator.kind];
+
   const synthCtx = useContext(SynthDataContext);
   const del = (): void => {
     const modulators = [...synthCtx.data.modulators];
@@ -86,33 +88,35 @@ const Modulator = ({
 
   return (
     <Link type={LinkType.Modulator} graph={tempUrl} del={del} idx={idx}>
-      <input type="hidden" value="1" />
-      <label>
-        <span className="kind"></span>
-        <select
-          onChange={(e) => changeShape(Number(e.target.value))}
-          value={modulator.shape}
-        >
-          {Object.entries(Oscillator)
-            .filter(([key, val]) => !isNaN(Number(val)))
-            .map(([key, val]) => {
-              const idx = `${key}-${Number(val)}`;
-              return (
-                <option key={idx} value={Number(val)}>
-                  {key}
-                </option>
-              );
-            })}
-        </select>
-      </label>
-      <label>
-        <input
-          type="numeric"
-          value={modulator.freq}
-          onChange={(e) => changeFreq(Number(e.target.value))}
-        />
-        <span>Hz</span>
-      </label>
+      <fieldset>
+        <title>{operation}</title>
+        <label>
+          <span className="kind"></span>
+          <select
+            onChange={(e) => changeShape(Number(e.target.value))}
+            value={modulator.shape}
+          >
+            {Object.entries(Oscillator)
+              .filter(([key, val]) => !isNaN(Number(val)))
+              .map(([key, val]) => {
+                const idx = `${key}-${Number(val)}`;
+                return (
+                  <option key={idx} value={Number(val)}>
+                    {key}
+                  </option>
+                );
+              })}
+          </select>
+        </label>
+        <label>
+          <input
+            type="numeric"
+            value={modulator.freq}
+            onChange={(e) => changeFreq(Number(e.target.value))}
+          />
+          <span>Hz</span>
+        </label>
+      </fieldset>
     </Link>
   );
 };
@@ -128,7 +132,7 @@ const Link = ({
   idx?: number | null
   graph?: string | undefined
   del?: null | (() => void)
-  children: JSX.Element[]
+  children: JSX.Element | JSX.Element[]
 }): JSX.Element => {
   const typeClass = type === LinkType.Source ? 'synth' : 'modulator';
   const cls = ['link'].concat([typeClass]).join(' ');

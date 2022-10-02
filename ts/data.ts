@@ -1,9 +1,14 @@
 import { createContext } from 'react';
 
 export class ModulatorData {
-  kind: number = 0;
+  kind: ModulatorKind = ModulatorKind.Add;
   shape: number = 0;
   freq: number = 0;
+}
+
+export enum ModulatorKind {
+  Add = 0,
+  Sub,
 }
 
 export class SynthData {
