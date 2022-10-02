@@ -46,25 +46,45 @@ const Modulators = ({
 }): JSX.Element => (
   <>
     {modulators.map((mod, idx) => (
-      <Modulator key={idx} modulator={mod} />
+      <Modulator key={idx} modulator={mod} idx={idx} />
     ))}
   </>
 );
 
 const Modulator = ({
-  modulator
+  modulator,
+  idx
 }: {
   modulator: ModulatorData
+  idx: number
 }): JSX.Element => {
   const graph = draw_lfo(modulator.shape, modulator.freq);
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
+
+	const synthCtx = useContext(SynthDataContext);
+	const del = (): void => {
+		const modulators = [...synthCtx.data.modulators];
+		modulators.splice(idx, 1);
+		synthCtx.setData({...synthCtx.data, modulators });
+	};
+	const changeFreq = (hz: number): void => {
+		const modulators = [...synthCtx.data.modulators];
+		modulators[idx].freq = hz;
+		synthCtx.setData({...synthCtx.data, modulators });
+	};
+	const changeShape = (shape: number): void => {
+		const modulators = [...synthCtx.data.modulators];
+		modulators[idx].shape = shape;
+		synthCtx.setData({...synthCtx.data, modulators });
+	};
+
   return (
-    <Link type="modulator" graph={tempUrl}>
+    <Link type="modulator" graph={tempUrl} del={del}>
       <input type="hidden" value="1" />
       <label>
         <span className="kind"></span>
-        <select>
+        <select onChange={ e => changeShape(Number(e.target.selectedIndex)) }>
           <option>Sine</option>
           <option>Square</option>
           <option>Triangle</option>
@@ -72,7 +92,7 @@ const Modulator = ({
         </select>
       </label>
       <label>
-        <input type="numeric" defaultValue="45" />
+        <input type="numeric" defaultValue="45" onChange={ e => changeFreq(Number(e.target.value)) } />
         <span>Hz</span>
       </label>
     </Link>
@@ -82,17 +102,31 @@ const Modulator = ({
 const Link = ({
   type,
   graph,
+  del,
   children
 }: {
   type: string
   graph?: string | undefined
+  del?: null | (() => void)
   children: JSX.Element[]
 }): JSX.Element => {
   const cls = ['link'].concat([type]).join(' ');
+	const synthCtx = useContext(SynthDataContext);
+
+	const add = (): void => {
+		const modulators = [...synthCtx.data.modulators];
+		modulators.push(new ModulatorData());
+		synthCtx.setData({...synthCtx.data, modulators });
+	};
+
   let kill = null;
   if (type === 'modulator') {
-    kill = <button className="kill">[x]</button>;
+	const delHandler = del
+		? (e: React.UIEvent):void => del()
+		: undefined;
+    kill = <button onClick={delHandler} className="kill">[x]</button>;
   }
+
   return (
     <div className={cls}>
       <div className="shape">
@@ -101,8 +135,8 @@ const Link = ({
       <div className="params">{children}</div>
       <div className="next">
         {kill}
-        <button className="add">Add</button>
-        <button className="sub">Sub</button>
+        <button className="add" onClick={e => add()}>Add</button>
+        <button className="sub" onClick={e => add()}>Sub</button>
       </div>
     </div>
   );
