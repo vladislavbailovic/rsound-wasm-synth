@@ -1,0 +1,41 @@
+.piano {
+  display: flex;
+  margin-top: 1rem;
+}
+.piano .key {
+  position: relative;
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0.5rem 0;
+  user-select: none;
+  cursor: pointer;
+}
+.piano .key {
+  width: 3.5rem;
+  height: 10rem;
+  z-index: 1;
+  border-left: 1px solid hsl(0, 0%, 73%);
+  border-bottom: 1px solid hsl(0, 0%, 73%);
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(to bottom, hsl(0, 0%, 93%) 0%, white 100%);
+  color: black;
+}
+
+.piano .key.black {
+  height: 8rem;
+  width: 2rem;
+  margin: 0 0 0 -1rem;
+  z-index: 2;
+  border: 1px solid black;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(45deg, hsl(0, 0%, 13%) 0%, hsl(0, 0%, 33%) 100%);
+  color: white;
+}
+.piano .key.offset {
+  margin: 0 0 0 -1rem;
+}
+.piano .key.active {
+  background: linear-gradient(45deg, hsl(0, 0%, 53%) 0%, hsl(0, 0%, 83%) 100%);
+}

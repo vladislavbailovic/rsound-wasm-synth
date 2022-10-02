@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { PitchClass } from '../pkg/rsound_wasm_synth';
 import { SynthDataContext } from './data';
 import { Player } from './player';
+import './keyboard.css';
 
 const _player = new Player();
 

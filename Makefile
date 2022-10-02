@@ -29,13 +29,13 @@ www/build: ts/*.ts ts/*.tsx Makefile node_modules
 tswatch: ts/*.ts ts/*.tsx Makefile node_modules package.json webpack.config.js
 	npx prettier ts webpack.config.js .eslintrc.js -w
 	npx eslint ts webpack.config.js .eslintrc.js --fix
+	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
 	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
 		--strict --checkJs \
 		--jsx react \
 		--watch
-	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
 webpackwatch: build/*.js Makefile package.json webpack.config.js
 	npx webpack watch
 watch: ; ${MAKE} -j4 tswatch webpackwatch
