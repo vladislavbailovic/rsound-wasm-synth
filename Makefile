@@ -29,10 +29,16 @@ www/build: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules
 	npx webpack
 	@touch $@
 
-tswatch: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules package.json webpack.config.js
+csswatch: $(CSSFILES)
+	echo $(CSSFILES) | sed 's/ /\n/g' | while inotifywait -e modify,create,delete --fromfile - ; do \
+		echo ; \
+	done
+	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
+	${MAKE} csswatch
+
+tswatch: $(TSFILES) $(TSXFILES) Makefile node_modules package.json webpack.config.js
 	npx prettier ts webpack.config.js .eslintrc.js -w
 	npx eslint ts webpack.config.js .eslintrc.js --fix
-	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
 	npx tsc ts/*.ts ts/*.tsx --outDir build --target es6 \
 		--module commonjs \
 		--esModuleInterop true \
@@ -41,4 +47,4 @@ tswatch: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules package.json w
 		--watch
 webpackwatch: build/*.js Makefile package.json webpack.config.js
 	npx webpack watch
-watch: ; ${MAKE} -j4 tswatch webpackwatch
+watch: ; ${MAKE} -j4 csswatch tswatch webpackwatch
