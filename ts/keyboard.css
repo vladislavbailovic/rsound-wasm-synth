@@ -1,6 +1,7 @@
 .piano {
   display: flex;
   margin-top: 1rem;
+  padding: 1rem;
 }
 .piano .key {
   position: relative;
@@ -11,6 +12,7 @@
   padding: 0.5rem 0;
   user-select: none;
   cursor: pointer;
+  margin: 0;
 }
 .piano .key {
   width: 3.5rem;

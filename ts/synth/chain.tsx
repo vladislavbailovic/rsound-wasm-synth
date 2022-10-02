@@ -38,7 +38,7 @@ const SynthSource = (): JSX.Element => {
         </select>
       </label>
       <label>
-        <input type="numeric" defaultValue="440" />
+        <input type="number" defaultValue="440" min="20" max="20000" />
         <span>Hz</span>
       </label>
     </Link>
@@ -113,9 +113,11 @@ const Modulator = ({
 
         <label>
           <input
-            type="numeric"
+            type="number"
             value={modulator.freq}
             onChange={(e) => changeFreq(Number(e.target.value))}
+            min="20"
+            max="20000"
           />
           <span>Hz</span>
         </label>
