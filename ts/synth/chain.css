@@ -50,3 +50,7 @@
   background: none;
   border: 1px solid var(--button-border-color);
 }
+
+.modulator img.graph {
+  max-width: 33.3%;
+}

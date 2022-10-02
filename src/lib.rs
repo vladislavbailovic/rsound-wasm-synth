@@ -8,8 +8,8 @@ pub use modulator::*;
 //     pub fn alert(s: &str);
 // }
 
-use instrument::oscillator::*;
 use instrument::generator::Signal;
+use instrument::oscillator::*;
 use instrument::*;
 use note::*;
 use rsound_output::{audio::PcmRenderer, Buffer};
@@ -40,20 +40,38 @@ pub fn draw_oscillator() -> Vec<u8> {
 }
 
 #[wasm_bindgen]
-pub fn draw_lfo(shape: i32, freq: i32) -> Vec<u8> {
-    let sample_len = 1000;
-    let osc = match shape {
-        1 => lfo::LFO::square(freq as f64),
-        2 => lfo::LFO::triangle(freq as f64),
-        3 => lfo::LFO::saw(freq as f64),
-        _ => lfo::LFO::sine(freq as f64),
+pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
+    let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
+    let kind: ModulatorKind = modulator.kind.into();
+    let data = match kind {
+        ModulatorKind::LFO => get_lfo_data(modulator),
+        ModulatorKind::ELFO => get_elfo_data(modulator),
     };
+    graph(&data)
+}
+
+fn get_elfo_data(modulator: ModulatorRawData) -> Vec<f64> {
+    let freq = modulator.freq as f64;
+    let osc = get_elfo(modulator);
+    let sample_len = 1000;
     let mut result = vec![0.0; sample_len];
     for i in 0..sample_len {
         let t = i as f64 / SAMPLE_RATE as f64;
-        result[i] = osc.value_at(t, 0.0);
+        result[i] = osc.value_at(t, freq);
     }
-    graph(&result)
+    result
+}
+
+fn get_lfo_data(modulator: ModulatorRawData) -> Vec<f64> {
+    let freq = modulator.freq as f64;
+    let osc = get_lfo(modulator);
+    let sample_len = 1000;
+    let mut result = vec![0.0; sample_len];
+    for i in 0..sample_len {
+        let t = i as f64 / SAMPLE_RATE as f64;
+        result[i] = osc.value_at(t, freq);
+    }
+    result
 }
 
 pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
@@ -77,7 +95,7 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     let envelope = envelope::ASR::new(0.015, 0.07);
     let mut chain = match base {
         1 => generator::chain::Chain::new(Oscillator::Square),
-        _ => generator::chain::Chain::new(Oscillator::Sine)
+        _ => generator::chain::Chain::new(Oscillator::Sine),
     };
     for res in mods {
         let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(res).unwrap();
@@ -87,15 +105,17 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
         //     Oscillator::Saw => lfo::LFO::saw(modulator.freq as f64),
         //     Oscillator::Sine => lfo::LFO::sine(modulator.freq as f64),
         // };
-        match modulator.op.into() {
-            ModulatorOp::Add => match modulator.kind.into() {
+        let op: ModulatorOp = modulator.op.into();
+        let kind: ModulatorKind = modulator.kind.into();
+        match op {
+            ModulatorOp::Add => match kind {
                 ModulatorKind::LFO => chain.add(get_lfo(modulator)),
                 ModulatorKind::ELFO => chain.add(get_elfo(modulator)),
             },
-            ModulatorOp::Sub => match modulator.kind.into() {
+            ModulatorOp::Sub => match kind {
                 ModulatorKind::LFO => chain.sub(get_lfo(modulator)),
                 ModulatorKind::ELFO => chain.sub(get_elfo(modulator)),
-            }
+            },
         };
     }
 
@@ -104,7 +124,8 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
 }
 
 fn get_lfo(x: ModulatorRawData) -> lfo::LFO {
-    match x.kind.into() {
+    let shape: Oscillator = x.shape.into();
+    match shape {
         Oscillator::Sine => lfo::LFO::sine(x.freq as f64),
         Oscillator::Square => lfo::LFO::square(x.freq as f64),
         Oscillator::Triangle => lfo::LFO::triangle(x.freq as f64),
@@ -113,14 +134,15 @@ fn get_lfo(x: ModulatorRawData) -> lfo::LFO {
 }
 
 fn get_elfo(x: ModulatorRawData) -> lfo::ELFO {
-    match x.kind.into() {
+    let shape: Oscillator = x.shape.into();
+    let modulator = match shape {
         Oscillator::Sine => lfo::ELFO::sine(x.freq as f64),
         Oscillator::Square => lfo::ELFO::square(x.freq as f64),
         Oscillator::Triangle => lfo::ELFO::triangle(x.freq as f64),
         Oscillator::Saw => lfo::ELFO::saw(x.freq as f64),
-    }
+    };
+    modulator.with_envelope(envelope::ASR::new(0.3, 0.15))
 }
-
 
 use graph::svg::Renderer;
 use graph::{Block, Graph, Line};
@@ -152,4 +174,19 @@ fn graph(sound: &[f64]) -> Vec<u8> {
     }
 
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_gets_lfo() {
+        let _x = ModulatorRawData {
+            op: 0,
+            kind: 0,
+            shape: 2,
+            freq: 220,
+        };
+    }
 }

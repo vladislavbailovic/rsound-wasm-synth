@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct ModulatorRawData {
@@ -12,7 +12,7 @@ pub struct ModulatorRawData {
 #[wasm_bindgen]
 pub enum ModulatorOp {
     Add,
-    Sub
+    Sub,
 }
 
 impl From<i32> for ModulatorOp {
@@ -27,7 +27,7 @@ impl From<i32> for ModulatorOp {
 #[wasm_bindgen]
 pub enum ModulatorKind {
     LFO,
-    ELFO
+    ELFO,
 }
 
 impl From<i32> for ModulatorKind {

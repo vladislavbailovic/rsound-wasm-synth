@@ -70,11 +70,12 @@ const Modulator = ({
   modulator: ModulatorData
   idx: number
 }): JSX.Element => {
-  const graph = draw_lfo(modulator.shape, modulator.freq);
+  const graph = draw_lfo(modulator);
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
 
-  const operation = ModulatorOp[modulator.kind];
+  const operation = ModulatorOp[modulator.op];
+  const kind = ModulatorKind[modulator.kind];
 
   const synthCtx = useContext(SynthDataContext);
   const del = (): void => {
@@ -90,13 +91,16 @@ const Modulator = ({
   const changeShape = (shape: Oscillator): void => {
     const modulators = [...synthCtx.data.modulators];
     modulators[idx].shape = shape;
+    console.log(shape, modulators);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
 
   return (
     <Link type={LinkType.Modulator} graph={tempUrl} del={del} idx={idx}>
       <fieldset>
-        <title>{operation}</title>
+        <title>
+          {operation} {kind}
+        </title>
 
         {Object.entries(Oscillator)
           .filter(([key, val]) => !isNaN(Number(val)))
