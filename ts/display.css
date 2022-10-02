@@ -1,12 +1,12 @@
 img.graph {
   max-width: 100%;
-  min-width: 80%;
+  min-width: 100%;
   display: block;
 }
 
 .display {
   display: flex;
-  width: 90%;
+  width: 100%;
   min-height: 150px;
   overflow: hidden;
   background: black;

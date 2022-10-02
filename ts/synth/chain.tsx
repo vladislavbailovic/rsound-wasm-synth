@@ -91,24 +91,26 @@ const Modulator = ({
     <Link type={LinkType.Modulator} graph={tempUrl} del={del} idx={idx}>
       <fieldset>
         <title>{operation}</title>
-        <label>
-          <span className="kind"></span>
-          <select
-            onChange={(e) => changeShape(Number(e.target.value))}
-            value={modulator.shape}
-          >
-            {Object.entries(Oscillator)
-              .filter(([key, val]) => !isNaN(Number(val)))
-              .map(([key, val]) => {
-                const idx = `${key}-${Number(val)}`;
-                return (
-                  <option key={idx} value={Number(val)}>
-                    {key}
-                  </option>
-                );
-              })}
-          </select>
-        </label>
+
+        {Object.entries(Oscillator)
+          .filter(([key, val]) => !isNaN(Number(val)))
+          .map(([key, val]) => {
+            const rkey = `${key}-${Number(val)}`;
+            const name = `shape-${idx}`;
+            return (
+              <label key={rkey}>
+                <input
+                  type="radio"
+                  name={name}
+                  onChange={(e) => changeShape(Number(val))}
+                  value={Number(val)}
+                  checked={Number(val) === modulator.shape}
+                />
+                <span>{key}</span>
+              </label>
+            );
+          })}
+
         <label>
           <input
             type="numeric"
