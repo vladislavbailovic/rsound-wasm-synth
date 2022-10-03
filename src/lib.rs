@@ -99,12 +99,6 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     };
     for res in mods {
         let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(res).unwrap();
-        // let m = match modulator.shape.into() {
-        //     Oscillator::Square => lfo::LFO::square(modulator.freq as f64),
-        //     Oscillator::Triangle => lfo::LFO::triangle(modulator.freq as f64),
-        //     Oscillator::Saw => lfo::LFO::saw(modulator.freq as f64),
-        //     Oscillator::Sine => lfo::LFO::sine(modulator.freq as f64),
-        // };
         let op: ModulatorOp = modulator.op.into();
         let kind: ModulatorKind = modulator.kind.into();
         match op {
