@@ -43,12 +43,6 @@ pub fn draw_oscillator() -> Vec<u8> {
 #[wasm_bindgen]
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
-    if let Some(e) = &modulator.env {
-        let econv: envelope::ASR = e.clone().into();
-        console_log(&format!("got env: {:?} == {:?}", e, econv));
-    } else {
-        console_log("no env in modulator");
-    }
     let kind: ModulatorKind = modulator.kind.into();
     let data = match kind {
         ModulatorKind::LFO => get_lfo_data(modulator),
@@ -142,6 +136,11 @@ fn get_elfo(x: ModulatorRawData) -> lfo::ELFO {
         Oscillator::Triangle => lfo::ELFO::triangle(x.freq as f64),
         Oscillator::Saw => lfo::ELFO::saw(x.freq as f64),
     };
+    if let Some(e) = x.env {
+        console_log(&format!("we have ELFO envelope: {:?}", e));
+        let env: envelope::ASR = e.into();
+        return modulator.with_envelope(env);
+    }
     modulator.with_envelope(envelope::ASR::new(0.3, 0.15, 0.2))
 }
 

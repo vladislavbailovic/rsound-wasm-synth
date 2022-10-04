@@ -5,6 +5,7 @@ import {
   draw,
   draw_lfo,
   Oscillator,
+  EnvelopeFactory,
   ModulatorKind,
   ModulatorOp
 } from '../../pkg/rsound_wasm_synth';
@@ -154,20 +155,35 @@ const Link = ({
   const synthCtx = useContext(SynthDataContext);
   const nextPosition = idx == null ? 0 : idx;
 
-  const injectModulator = (op: ModulatorOp, kind: ModulatorKind): void => {
+  const injectModulator = (mod: ModulatorData): void => {
     const modulators = [...synthCtx.data.modulators];
-    const mod = ModulatorData.from({ op, kind });
     modulators.splice(nextPosition + 1, 0, mod);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
   const addLfo = (): void =>
-    injectModulator(ModulatorOp.Add, ModulatorKind.LFO);
+    injectModulator(
+      ModulatorData.from({ op: ModulatorOp.Add, kind: ModulatorKind.LFO })
+    );
   const subLfo = (): void =>
-    injectModulator(ModulatorOp.Sub, ModulatorKind.LFO);
+    injectModulator(
+      ModulatorData.from({ op: ModulatorOp.Sub, kind: ModulatorKind.LFO })
+    );
   const addElfo = (): void =>
-    injectModulator(ModulatorOp.Add, ModulatorKind.ELFO);
+    injectModulator(
+      ModulatorData.from({
+        op: ModulatorOp.Add,
+        kind: ModulatorKind.ELFO,
+        env: EnvelopeFactory.ASR(13, 12, 161)
+      })
+    );
   const subElfo = (): void =>
-    injectModulator(ModulatorOp.Sub, ModulatorKind.ELFO);
+    injectModulator(
+      ModulatorData.from({
+        op: ModulatorOp.Add,
+        kind: ModulatorKind.ELFO,
+        env: EnvelopeFactory.ASR(13, 12, 161)
+      })
+    );
 
   let kill = null;
   if (type === LinkType.Modulator) {

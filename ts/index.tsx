@@ -4,7 +4,7 @@ import { Interface } from './interface';
 import { SynthDataContext, SynthData, ModulatorData } from './data';
 import { Player, PlayerContext } from './player';
 
-import init, { EnvelopeFactory } from '../pkg/rsound_wasm_synth';
+import init from '../pkg/rsound_wasm_synth';
 
 const ContextProvider = ({
   children
@@ -13,9 +13,7 @@ const ContextProvider = ({
 }): JSX.Element => {
   const synth = {
     tone: 0,
-    modulators: [
-      ModulatorData.from({ freq: 45, env: EnvelopeFactory.ASR(13, 12, 161) })
-    ]
+    modulators: [ModulatorData.from({ freq: 45 })]
   };
   const [data, setData] = useState<SynthData>(synth);
 
