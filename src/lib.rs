@@ -92,7 +92,7 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     };
     let n = Note::Tone(pc, Octave::C3, val![1 / 4]);
 
-    let envelope = envelope::Relative::new(0.015, 0.07);
+    let envelope = envelope::ASR::new(0.015, 0.07, 0.2);
     let mut chain = match base {
         1 => generator::chain::Chain::new(Oscillator::Square),
         _ => generator::chain::Chain::new(Oscillator::Sine),
@@ -135,7 +135,7 @@ fn get_elfo(x: ModulatorRawData) -> lfo::ELFO {
         Oscillator::Triangle => lfo::ELFO::triangle(x.freq as f64),
         Oscillator::Saw => lfo::ELFO::saw(x.freq as f64),
     };
-    modulator.with_envelope(envelope::Relative::new(0.3, 0.15))
+    modulator.with_envelope(envelope::ASR::new(0.3, 0.15, 0.2))
 }
 
 use graph::svg::Renderer;
