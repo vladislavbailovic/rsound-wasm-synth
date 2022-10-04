@@ -3,10 +3,11 @@ use wasm_bindgen::prelude::*;
 mod modulator;
 pub use modulator::*;
 
-// #[wasm_bindgen]
-// extern {
-//     pub fn alert(s: &str);
-// }
+#[wasm_bindgen]
+extern {
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn console_log(s: &str);
+}
 
 use instrument::generator::Signal;
 use instrument::oscillator::*;
@@ -42,6 +43,11 @@ pub fn draw_oscillator() -> Vec<u8> {
 #[wasm_bindgen]
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
+    if let Some(e) = &modulator.env {
+        console_log(&format!("got env: {:?}", e));
+    } else {
+        console_log("no env in modulator");
+    }
     let kind: ModulatorKind = modulator.kind.into();
     let data = match kind {
         ModulatorKind::LFO => get_lfo_data(modulator),

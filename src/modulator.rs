@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
+use instrument::envelope::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct ModulatorRawData {
@@ -7,6 +8,58 @@ pub struct ModulatorRawData {
     pub kind: i32,
     pub shape: i32,
     pub freq: i32,
+    pub env: Option<EnvelopeRawData>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[wasm_bindgen]
+pub struct EnvelopeRawData {
+    pub kind: i32,
+    pub delay: Option<i32>,
+    pub attack: Option<i32>,
+    pub sustain: Option<i32>,
+    pub release: Option<i32>,
+}
+
+#[wasm_bindgen]
+pub enum EnvelopeKind {
+    ASR
+}
+
+impl From<i32> for EnvelopeKind {
+    fn from(x: i32) -> EnvelopeKind {
+        match x {
+            _ => EnvelopeKind::ASR,
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub struct EnvelopeFactory;
+
+#[wasm_bindgen]
+impl EnvelopeFactory {
+    #[wasm_bindgen]
+    pub fn asr_working() -> JsValue {
+        serde_wasm_bindgen::to_value(&EnvelopeRawData{
+            kind: EnvelopeKind::ASR as i32,
+            delay: None,
+            attack: Some(15),
+            sustain: Some(15),
+            release: Some(15),
+        }).unwrap()
+    }
+
+    #[wasm_bindgen]
+    pub fn asr(a: i32, s: i32, r: i32) -> EnvelopeRawData {
+        EnvelopeRawData{
+            kind: EnvelopeKind::ASR as i32,
+            delay: None,
+            attack: Some(a),
+            sustain: Some(s),
+            release: Some(r),
+        }
+    }
 }
 
 #[wasm_bindgen]
