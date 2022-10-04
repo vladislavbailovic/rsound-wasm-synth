@@ -5,7 +5,6 @@ import {
   draw,
   draw_lfo,
   Oscillator,
-  EnvelopeFactory,
   ModulatorKind,
   ModulatorOp
 } from '../../pkg/rsound_wasm_synth';
@@ -18,7 +17,6 @@ enum LinkType {
 
 export const Synth = ({ type }: { type: string }): JSX.Element => {
   const synthCtx = useContext(SynthDataContext);
-  console.log(EnvelopeFactory.asr(13, 12, 161));
 
   const cls = ['synth'].concat([type]).join(' ');
   const graph = draw(synthCtx.data.tone, 0, synthCtx.data.modulators);

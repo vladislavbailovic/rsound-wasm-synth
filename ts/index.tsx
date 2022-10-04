@@ -14,7 +14,7 @@ const ContextProvider = ({
   const synth = {
     tone: 0,
     modulators: [
-      ModulatorData.from({ freq: 45, env: EnvelopeFactory.asr(13, 12, 161) })
+      ModulatorData.from({ freq: 45, env: EnvelopeFactory.ASR(13, 12, 161) })
     ]
   };
   const [data, setData] = useState<SynthData>(synth);

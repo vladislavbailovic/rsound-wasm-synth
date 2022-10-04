@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-use instrument::envelope::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct ModulatorRawData {
@@ -23,13 +22,21 @@ pub struct EnvelopeRawData {
 
 #[wasm_bindgen]
 pub enum EnvelopeKind {
-    ASR
+    Fixed,
+    RAR,
+    DRAR,
+    ASR,
+    DASR,
 }
 
 impl From<i32> for EnvelopeKind {
     fn from(x: i32) -> EnvelopeKind {
         match x {
-            _ => EnvelopeKind::ASR,
+            1 => EnvelopeKind::RAR,
+            2 => EnvelopeKind::DRAR,
+            3 => EnvelopeKind::ASR,
+            4 => EnvelopeKind::DASR,
+            _ => EnvelopeKind::Fixed,
         }
     }
 }
@@ -39,22 +46,51 @@ pub struct EnvelopeFactory;
 
 #[wasm_bindgen]
 impl EnvelopeFactory {
-    #[wasm_bindgen]
-    pub fn asr_working() -> JsValue {
-        serde_wasm_bindgen::to_value(&EnvelopeRawData{
-            kind: EnvelopeKind::ASR as i32,
+    #[wasm_bindgen(js_name = Fixed)]
+    pub fn fixed() -> EnvelopeRawData {
+        EnvelopeRawData {
+            kind: EnvelopeKind::Fixed as i32,
             delay: None,
-            attack: Some(15),
-            sustain: Some(15),
-            release: Some(15),
-        }).unwrap()
+            attack: None,
+            sustain: None,
+            release: None,
+        }
     }
-
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = RAR)]
+    pub fn rar(a: i32, r: i32) -> EnvelopeRawData {
+        EnvelopeRawData {
+            kind: EnvelopeKind::RAR as i32,
+            delay: None,
+            attack: Some(a),
+            sustain: None,
+            release: Some(r),
+        }
+    }
+    #[wasm_bindgen(js_name = DRAR)]
+    pub fn drar(d: i32, a: i32, r: i32) -> EnvelopeRawData {
+        EnvelopeRawData {
+            kind: EnvelopeKind::DRAR as i32,
+            delay: Some(d),
+            attack: Some(a),
+            sustain: None,
+            release: Some(r),
+        }
+    }
+    #[wasm_bindgen(js_name = ASR)]
     pub fn asr(a: i32, s: i32, r: i32) -> EnvelopeRawData {
-        EnvelopeRawData{
+        EnvelopeRawData {
             kind: EnvelopeKind::ASR as i32,
             delay: None,
+            attack: Some(a),
+            sustain: Some(s),
+            release: Some(r),
+        }
+    }
+    #[wasm_bindgen(js_name = DASR)]
+    pub fn dasr(d: i32, a: i32, s: i32, r: i32) -> EnvelopeRawData {
+        EnvelopeRawData {
+            kind: EnvelopeKind::DASR as i32,
+            delay: Some(d),
             attack: Some(a),
             sustain: Some(s),
             release: Some(r),

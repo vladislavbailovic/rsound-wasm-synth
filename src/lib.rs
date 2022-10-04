@@ -4,7 +4,7 @@ mod modulator;
 pub use modulator::*;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn console_log(s: &str);
 }
