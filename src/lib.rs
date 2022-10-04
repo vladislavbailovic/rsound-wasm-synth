@@ -44,7 +44,8 @@ pub fn draw_oscillator() -> Vec<u8> {
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
     if let Some(e) = &modulator.env {
-        console_log(&format!("got env: {:?}", e));
+        let econv: envelope::ASR = e.clone().into();
+        console_log(&format!("got env: {:?} == {:?}", e, econv));
     } else {
         console_log("no env in modulator");
     }

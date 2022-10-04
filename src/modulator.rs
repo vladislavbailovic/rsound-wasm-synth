@@ -1,3 +1,4 @@
+use instrument::envelope;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -10,7 +11,7 @@ pub struct ModulatorRawData {
     pub env: Option<EnvelopeRawData>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[wasm_bindgen]
 pub struct EnvelopeRawData {
     pub kind: i32,
@@ -95,6 +96,16 @@ impl EnvelopeFactory {
             sustain: Some(s),
             release: Some(r),
         }
+    }
+}
+
+impl From<EnvelopeRawData> for envelope::ASR {
+    fn from(x: EnvelopeRawData) -> Self {
+        envelope::ASR::new(
+            x.attack.unwrap() as f64 / 1000.0,
+            x.sustain.unwrap() as f64 / 1000.0,
+            x.release.unwrap() as f64 / 1000.0,
+        )
     }
 }
 
