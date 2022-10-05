@@ -21,6 +21,18 @@ pub struct EnvelopeRawData {
     pub release: Option<i32>,
 }
 
+impl Default for EnvelopeRawData {
+    fn default() -> Self {
+        Self {
+            kind: EnvelopeKind::Fixed as i32,
+            delay: None,
+            attack: None,
+            sustain: None,
+            release: None,
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub enum EnvelopeKind {
     Fixed,
@@ -51,20 +63,16 @@ impl EnvelopeFactory {
     pub fn fixed() -> EnvelopeRawData {
         EnvelopeRawData {
             kind: EnvelopeKind::Fixed as i32,
-            delay: None,
-            attack: None,
-            sustain: None,
-            release: None,
+            ..EnvelopeRawData::default()
         }
     }
     #[wasm_bindgen(js_name = RAR)]
     pub fn rar(a: i32, r: i32) -> EnvelopeRawData {
         EnvelopeRawData {
             kind: EnvelopeKind::RAR as i32,
-            delay: None,
             attack: Some(a),
-            sustain: None,
             release: Some(r),
+            ..EnvelopeRawData::default()
         }
     }
     #[wasm_bindgen(js_name = DRAR)]
@@ -73,18 +81,18 @@ impl EnvelopeFactory {
             kind: EnvelopeKind::DRAR as i32,
             delay: Some(d),
             attack: Some(a),
-            sustain: None,
             release: Some(r),
+            ..EnvelopeRawData::default()
         }
     }
     #[wasm_bindgen(js_name = ASR)]
     pub fn asr(a: i32, s: i32, r: i32) -> EnvelopeRawData {
         EnvelopeRawData {
             kind: EnvelopeKind::ASR as i32,
-            delay: None,
             attack: Some(a),
             sustain: Some(s),
             release: Some(r),
+            ..EnvelopeRawData::default()
         }
     }
     #[wasm_bindgen(js_name = DASR)]
@@ -99,13 +107,31 @@ impl EnvelopeFactory {
     }
 }
 
-impl From<EnvelopeRawData> for envelope::ASR {
-    fn from(x: EnvelopeRawData) -> Self {
-        envelope::ASR::new(
-            x.attack.unwrap() as f64 / 1000.0,
-            x.sustain.unwrap() as f64 / 1000.0,
-            x.release.unwrap() as f64 / 1000.0,
-        )
+impl From<EnvelopeRawData> for Box<dyn envelope::Envelope> {
+    fn from(x: EnvelopeRawData) -> Box<dyn envelope::Envelope> {
+        match x.kind.into() {
+            EnvelopeKind::RAR => Box::new(envelope::RAR::new(
+                x.attack.unwrap() as f64 / 1000.0,
+                x.release.unwrap() as f64 / 1000.0,
+            )),
+            EnvelopeKind::DRAR => Box::new(envelope::DRAR::new(
+                x.delay.unwrap() as f64 / 1000.0,
+                x.sustain.unwrap() as f64 / 1000.0,
+                x.release.unwrap() as f64 / 1000.0,
+            )),
+            EnvelopeKind::ASR => Box::new(envelope::ASR::new(
+                x.attack.unwrap() as f64 / 1000.0,
+                x.sustain.unwrap() as f64 / 1000.0,
+                x.release.unwrap() as f64 / 1000.0,
+            )),
+            EnvelopeKind::DASR => Box::new(envelope::DASR::new(
+                x.delay.unwrap() as f64 / 1000.0,
+                x.attack.unwrap() as f64 / 1000.0,
+                x.sustain.unwrap() as f64 / 1000.0,
+                x.release.unwrap() as f64 / 1000.0,
+            )),
+            _ => Box::new(envelope::Fixed {}),
+        }
     }
 }
 
