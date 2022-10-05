@@ -176,6 +176,7 @@ mod test_modulator_op {
             kind: 0,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.op.into() {
             ModulatorOp::Add => assert!(true),
@@ -190,6 +191,7 @@ mod test_modulator_op {
             kind: 0,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.op.into() {
             ModulatorOp::Add => assert!(false, "should have been Sub"),
@@ -204,6 +206,7 @@ mod test_modulator_op {
             kind: 0,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.op.into() {
             ModulatorOp::Add => assert!(true),
@@ -223,6 +226,7 @@ mod test_modulator_kind {
             kind: 0,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.kind.into() {
             ModulatorKind::LFO => assert!(true),
@@ -237,6 +241,7 @@ mod test_modulator_kind {
             kind: 1,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.kind.into() {
             ModulatorKind::LFO => assert!(false, "should have been ELFO"),
@@ -251,6 +256,7 @@ mod test_modulator_kind {
             kind: 1312,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.kind.into() {
             ModulatorKind::LFO => assert!(true),
@@ -271,6 +277,7 @@ mod test_oscillator_shape {
             kind: 0,
             shape: 0,
             freq: 0,
+            env: None,
         };
         match x.shape.into() {
             Oscillator::Sine => assert!(true),
@@ -287,6 +294,7 @@ mod test_oscillator_shape {
             kind: 0,
             shape: 1,
             freq: 0,
+            env: None,
         };
         match x.shape.into() {
             Oscillator::Sine => assert!(false, "Should have been Square"),
@@ -303,6 +311,7 @@ mod test_oscillator_shape {
             kind: 0,
             shape: 2,
             freq: 0,
+            env: None,
         };
         match x.shape.into() {
             Oscillator::Sine => assert!(false, "Should have been Triangle"),
@@ -319,6 +328,7 @@ mod test_oscillator_shape {
             kind: 0,
             shape: 3,
             freq: 0,
+            env: None,
         };
         match x.shape.into() {
             Oscillator::Sine => assert!(false, "Should have been Saw"),
@@ -335,6 +345,7 @@ mod test_oscillator_shape {
             kind: 0,
             shape: 1312,
             freq: 0,
+            env: None,
         };
         match x.shape.into() {
             Oscillator::Sine => assert!(true),

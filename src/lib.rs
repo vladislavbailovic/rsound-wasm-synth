@@ -51,6 +51,20 @@ pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     graph(&data)
 }
 
+#[wasm_bindgen]
+pub fn draw_env(raw: JsValue) -> Vec<u8> {
+    let data: EnvelopeRawData = serde_wasm_bindgen::from_value(raw).unwrap();
+    let env: &Box<dyn envelope::Envelope> = &data.into();
+    let sample_len = (SAMPLE_RATE as f64 * env.min()) as usize;
+    // TODO: handle zero-length sample_len (E.g. for fixed)
+    let mut result = vec![0.0; sample_len];
+    for i in 0..sample_len {
+        let t = i as f64 / SAMPLE_RATE as f64;
+        result[i] = env.value_at(t, 1.0);
+    }
+    graph(&result)
+}
+
 fn get_elfo_data(modulator: ModulatorRawData) -> Vec<f64> {
     let freq = modulator.freq as f64;
     let osc = get_elfo(modulator);
@@ -187,6 +201,7 @@ mod tests {
             kind: 0,
             shape: 2,
             freq: 220,
+            env: None,
         };
     }
 }

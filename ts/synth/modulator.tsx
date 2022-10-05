@@ -3,6 +3,7 @@ import { Display } from '../display';
 import { SynthDataContext, ModulatorData } from '../data';
 import {
   draw_lfo,
+  draw_env,
   Oscillator,
   EnvelopeFactory,
   ModulatorKind,
@@ -54,6 +55,11 @@ const Modulator = ({
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
 
+  let envelope = null;
+  if (modulator.kind === ModulatorKind.ELFO) {
+    envelope = <Envelope modulator={modulator} idx={idx} />;
+  }
+
   return (
     <div className="link modulator">
       <div className="shape">
@@ -96,7 +102,29 @@ const Modulator = ({
           </label>
         </fieldset>
       </div>
+      {envelope}
       <Next idx={idx} del={del} />
+    </div>
+  );
+};
+
+const Envelope = ({
+  modulator,
+  idx
+}: {
+  modulator: ModulatorData
+  idx: number
+}): JSX.Element | null => {
+  const envelope = modulator.env;
+  if (envelope == null) {
+    return null;
+  }
+  const graph = draw_env(envelope);
+  const blob = new Blob([graph], { type: 'image/svg+xml' });
+  const tempUrl = window.URL.createObjectURL(blob);
+  return (
+    <div className="envelope">
+      <Display src={tempUrl} />
     </div>
   );
 };
