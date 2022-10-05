@@ -19,8 +19,8 @@ pub struct ModulatorRawData {
 
 #[wasm_bindgen]
 impl ModulatorRawData {
-    #[wasm_bindgen]
-    pub fn from(
+    #[wasm_bindgen(constructor)]
+    pub fn new(
         op: Option<ModulatorOp>,
         kind: Option<ModulatorKind>,
         shape: Option<Oscillator>,
@@ -50,10 +50,15 @@ impl ModulatorRawData {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[wasm_bindgen]
 pub struct EnvelopeRawData {
+    #[wasm_bindgen(readonly)]
     pub kind: i32,
+    #[wasm_bindgen(readonly)]
     pub delay: Option<i32>,
+    #[wasm_bindgen(readonly)]
     pub attack: Option<i32>,
+    #[wasm_bindgen(readonly)]
     pub sustain: Option<i32>,
+    #[wasm_bindgen(readonly)]
     pub release: Option<i32>,
 }
 

@@ -13,7 +13,7 @@ const ContextProvider = ({
 }): JSX.Element => {
   const synth = {
     tone: 0,
-    modulators: [ModulatorRawData.from(undefined, undefined, undefined, 45)]
+    modulators: [new ModulatorRawData(undefined, undefined, undefined, 45)]
   };
   const [data, setData] = useState<SynthData>(synth);
 

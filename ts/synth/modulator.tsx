@@ -146,12 +146,12 @@ export const Next = ({
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
   const addLfo = (): void =>
-    injectModulator(ModulatorRawData.from(ModulatorOp.Add, ModulatorKind.LFO));
+    injectModulator(new ModulatorRawData(ModulatorOp.Add, ModulatorKind.LFO));
   const subLfo = (): void =>
-    injectModulator(ModulatorRawData.from(ModulatorOp.Sub, ModulatorKind.LFO));
+    injectModulator(new ModulatorRawData(ModulatorOp.Sub, ModulatorKind.LFO));
   const addElfo = (): void =>
     injectModulator(
-      ModulatorRawData.from(
+      new ModulatorRawData(
         ModulatorOp.Add,
         ModulatorKind.ELFO,
         undefined,
@@ -161,7 +161,7 @@ export const Next = ({
     );
   const subElfo = (): void =>
     injectModulator(
-      ModulatorRawData.from(
+      new ModulatorRawData(
         ModulatorOp.Add,
         ModulatorKind.ELFO,
         undefined,
