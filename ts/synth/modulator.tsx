@@ -1,20 +1,21 @@
 import React, { useContext } from 'react';
 import { Display } from '../display';
-import { SynthDataContext, ModulatorData } from '../data';
+import { SynthDataContext } from '../data';
 import {
   draw_lfo,
   draw_env,
   Oscillator,
   EnvelopeFactory,
   ModulatorKind,
-  ModulatorOp
+  ModulatorOp,
+  ModulatorRawData
 } from '../../pkg/rsound_wasm_synth';
 import './chain.css';
 
 export const Modulators = ({
   modulators
 }: {
-  modulators: ModulatorData[]
+  modulators: ModulatorRawData[]
 }): JSX.Element => (
   <>
     {modulators.map((mod, idx) => (
@@ -27,7 +28,7 @@ const Modulator = ({
   modulator,
   idx
 }: {
-  modulator: ModulatorData
+  modulator: ModulatorRawData
   idx: number
 }): JSX.Element => {
   const graph = draw_lfo(modulator);
@@ -112,7 +113,7 @@ const Envelope = ({
   modulator,
   idx
 }: {
-  modulator: ModulatorData
+  modulator: ModulatorRawData
   idx: number
 }): JSX.Element | null => {
   const envelope = modulator.env;
@@ -139,34 +140,34 @@ export const Next = ({
   const synthCtx = useContext(SynthDataContext);
   const nextPosition = idx == null ? 0 : idx;
 
-  const injectModulator = (mod: ModulatorData): void => {
+  const injectModulator = (mod: ModulatorRawData): void => {
     const modulators = [...synthCtx.data.modulators];
     modulators.splice(nextPosition + 1, 0, mod);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
   const addLfo = (): void =>
-    injectModulator(
-      ModulatorData.from({ op: ModulatorOp.Add, kind: ModulatorKind.LFO })
-    );
+    injectModulator(ModulatorRawData.from(ModulatorOp.Add, ModulatorKind.LFO));
   const subLfo = (): void =>
-    injectModulator(
-      ModulatorData.from({ op: ModulatorOp.Sub, kind: ModulatorKind.LFO })
-    );
+    injectModulator(ModulatorRawData.from(ModulatorOp.Sub, ModulatorKind.LFO));
   const addElfo = (): void =>
     injectModulator(
-      ModulatorData.from({
-        op: ModulatorOp.Add,
-        kind: ModulatorKind.ELFO,
-        env: EnvelopeFactory.ASR(13, 12, 161)
-      })
+      ModulatorRawData.from(
+        ModulatorOp.Add,
+        ModulatorKind.ELFO,
+        undefined,
+        undefined,
+        EnvelopeFactory.ASR(13, 12, 161)
+      )
     );
   const subElfo = (): void =>
     injectModulator(
-      ModulatorData.from({
-        op: ModulatorOp.Add,
-        kind: ModulatorKind.ELFO,
-        env: EnvelopeFactory.ASR(13, 12, 161)
-      })
+      ModulatorRawData.from(
+        ModulatorOp.Add,
+        ModulatorKind.ELFO,
+        undefined,
+        undefined,
+        EnvelopeFactory.ASR(13, 12, 161)
+      )
     );
 
   let kill = null;

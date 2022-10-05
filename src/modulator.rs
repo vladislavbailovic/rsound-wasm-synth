@@ -1,14 +1,50 @@
-use instrument::envelope;
+use instrument::{envelope, oscillator::Oscillator};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 #[derive(Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct ModulatorRawData {
+    #[wasm_bindgen(readonly)]
     pub op: i32,
+    #[wasm_bindgen(readonly)]
     pub kind: i32,
+    #[wasm_bindgen(readonly)]
     pub shape: i32,
+    #[wasm_bindgen(readonly)]
     pub freq: i32,
+    #[wasm_bindgen(readonly)]
     pub env: Option<EnvelopeRawData>,
+}
+
+#[wasm_bindgen]
+impl ModulatorRawData {
+    #[wasm_bindgen]
+    pub fn from(
+        op: Option<ModulatorOp>,
+        kind: Option<ModulatorKind>,
+        shape: Option<Oscillator>,
+        freq: Option<i32>,
+        env: Option<EnvelopeRawData>,
+    ) -> Self {
+        ModulatorRawData {
+            op: (op.unwrap_or(ModulatorOp::Add)) as i32,
+            kind: (kind.unwrap_or(ModulatorKind::LFO)) as i32,
+            shape: (shape.unwrap_or(Oscillator::Sine)) as i32,
+            freq: (freq.unwrap_or(0)),
+            env,
+        }
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_freq(&mut self, freq: i32) {
+        self.freq = freq;
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_shape(&mut self, shape: Oscillator) {
+        self.shape = shape as i32;
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]

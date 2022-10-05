@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Interface } from './interface';
-import { SynthDataContext, SynthData, ModulatorData } from './data';
+import { SynthDataContext, SynthData } from './data';
 import { Player, PlayerContext } from './player';
 
-import init from '../pkg/rsound_wasm_synth';
+import init, { ModulatorRawData } from '../pkg/rsound_wasm_synth';
 
 const ContextProvider = ({
   children
@@ -13,7 +13,7 @@ const ContextProvider = ({
 }): JSX.Element => {
   const synth = {
     tone: 0,
-    modulators: [ModulatorData.from({ freq: 45 })]
+    modulators: [ModulatorRawData.from(undefined, undefined, undefined, 45)]
   };
   const [data, setData] = useState<SynthData>(synth);
 
