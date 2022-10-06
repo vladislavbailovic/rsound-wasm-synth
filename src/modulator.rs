@@ -25,8 +25,17 @@ impl ModulatorRawData {
         kind: Option<ModulatorKind>,
         shape: Option<Oscillator>,
         freq: Option<i32>,
-        env: Option<EnvelopeRawData>,
+        envelope: Option<EnvelopeRawData>,
     ) -> Self {
+        let env = if let Some(ModulatorKind::ELFO) = kind {
+            if envelope.is_none() {
+                Some(EnvelopeRawData::default())
+            } else {
+                envelope
+            }
+        } else {
+            None
+        };
         ModulatorRawData {
             op: (op.unwrap_or(ModulatorOp::Add)) as i32,
             kind: (kind.unwrap_or(ModulatorKind::LFO)) as i32,
@@ -46,6 +55,8 @@ impl ModulatorRawData {
         self.shape = shape as i32;
     }
 }
+
+// TODO: make ModulatorRawData => (E)LFO conversion safe through typesystem
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[wasm_bindgen]
