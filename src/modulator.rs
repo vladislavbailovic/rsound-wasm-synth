@@ -54,6 +54,38 @@ impl ModulatorRawData {
     pub fn set_shape(&mut self, shape: Oscillator) {
         self.shape = shape as i32;
     }
+
+    fn to_lfo(&self) -> instrument::lfo::LFO {
+        match self.shape.into() {
+            Oscillator::Sine => instrument::lfo::LFO::sine(self.freq as f64),
+            Oscillator::Square => instrument::lfo::LFO::square(self.freq as f64),
+            Oscillator::Triangle => instrument::lfo::LFO::triangle(self.freq as f64),
+            Oscillator::Saw => instrument::lfo::LFO::saw(self.freq as f64),
+        }
+    }
+
+    fn to_elfo(&self) -> instrument::lfo::ELFO {
+        let modulator = match self.shape.into() {
+            Oscillator::Sine => instrument::lfo::ELFO::sine(self.freq as f64),
+            Oscillator::Square => instrument::lfo::ELFO::square(self.freq as f64),
+            Oscillator::Triangle => instrument::lfo::ELFO::triangle(self.freq as f64),
+            Oscillator::Saw => instrument::lfo::ELFO::saw(self.freq as f64),
+        };
+        if let Some(e) = self.env {
+            let env: Box<dyn envelope::Envelope> = e.into();
+            return modulator.with_env_box(env);
+        }
+        modulator.with_envelope(envelope::ASR::new(0.3, 0.15, 0.2))
+    }
+}
+
+impl From<ModulatorRawData> for Box<dyn instrument::generator::Signal> {
+    fn from(x: ModulatorRawData) -> Box<dyn instrument::generator::Signal> {
+        match x.kind.into() {
+            ModulatorKind::LFO => Box::new(x.to_lfo()),
+            ModulatorKind::ELFO => Box::new(x.to_elfo()),
+        }
+    }
 }
 
 // TODO: make ModulatorRawData => (E)LFO conversion safe through typesystem

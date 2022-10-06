@@ -67,7 +67,7 @@ pub fn draw_env(raw: JsValue) -> Vec<u8> {
 
 fn get_elfo_data(modulator: ModulatorRawData) -> Vec<f64> {
     let freq = modulator.freq as f64;
-    let osc = get_elfo(modulator);
+    let osc: Box<dyn Signal> = modulator.into();
     let sample_len = 1000;
     let mut result = vec![0.0; sample_len];
     for i in 0..sample_len {
@@ -79,7 +79,7 @@ fn get_elfo_data(modulator: ModulatorRawData) -> Vec<f64> {
 
 fn get_lfo_data(modulator: ModulatorRawData) -> Vec<f64> {
     let freq = modulator.freq as f64;
-    let osc = get_lfo(modulator);
+    let osc: Box<dyn Signal> = modulator.into();
     let sample_len = 1000;
     let mut result = vec![0.0; sample_len];
     for i in 0..sample_len {
@@ -114,48 +114,14 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     };
     for res in mods {
         let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(res).unwrap();
-        let op: ModulatorOp = modulator.op.into();
-        let kind: ModulatorKind = modulator.kind.into();
-        match op {
-            ModulatorOp::Add => match kind {
-                ModulatorKind::LFO => chain.add(get_lfo(modulator)),
-                ModulatorKind::ELFO => chain.add(get_elfo(modulator)),
-            },
-            ModulatorOp::Sub => match kind {
-                ModulatorKind::LFO => chain.sub(get_lfo(modulator)),
-                ModulatorKind::ELFO => chain.sub(get_elfo(modulator)),
-            },
+        match modulator.op.into() {
+            ModulatorOp::Add => chain.add_box(modulator.into()),
+            ModulatorOp::Sub => chain.sub_box(modulator.into()),
         };
     }
 
     let synth = Instrument::new(chain, envelope);
     synth.play(90.0, n, 1.0)
-}
-
-fn get_lfo(x: ModulatorRawData) -> lfo::LFO {
-    let shape: Oscillator = x.shape.into();
-    match shape {
-        Oscillator::Sine => lfo::LFO::sine(x.freq as f64),
-        Oscillator::Square => lfo::LFO::square(x.freq as f64),
-        Oscillator::Triangle => lfo::LFO::triangle(x.freq as f64),
-        Oscillator::Saw => lfo::LFO::saw(x.freq as f64),
-    }
-}
-
-fn get_elfo(x: ModulatorRawData) -> lfo::ELFO {
-    let shape: Oscillator = x.shape.into();
-    let modulator = match shape {
-        Oscillator::Sine => lfo::ELFO::sine(x.freq as f64),
-        Oscillator::Square => lfo::ELFO::square(x.freq as f64),
-        Oscillator::Triangle => lfo::ELFO::triangle(x.freq as f64),
-        Oscillator::Saw => lfo::ELFO::saw(x.freq as f64),
-    };
-    if let Some(e) = x.env {
-        console_log(&format!("we have ELFO envelope: {:?}", e));
-        let env: Box<dyn envelope::Envelope> = e.into();
-        return modulator.with_env_box(env);
-    }
-    modulator.with_envelope(envelope::ASR::new(0.3, 0.15, 0.2))
 }
 
 use graph::svg::Renderer;
