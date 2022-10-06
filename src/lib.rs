@@ -13,7 +13,8 @@ use instrument::generator::Signal;
 use instrument::oscillator::*;
 use instrument::*;
 use note::*;
-use rsound_output::{audio::PcmRenderer, Buffer};
+use rsound_output::Buffer; // TODO: refactor PcmRenderer into f32 buffer getter for web audio and
+                           // add it here
 
 #[wasm_bindgen]
 pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
