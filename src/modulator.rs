@@ -88,8 +88,6 @@ impl From<ModulatorRawData> for Box<dyn instrument::generator::Signal> {
     }
 }
 
-// TODO: make ModulatorRawData => (E)LFO conversion safe through typesystem
-
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 #[wasm_bindgen]
 pub struct EnvelopeRawData {
