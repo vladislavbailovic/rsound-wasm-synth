@@ -10,6 +10,7 @@
   margin: 10px 0;
 }
 
+/* synth */
 .synth .link {
   display: flex;
   margin: 5px;
@@ -51,6 +52,56 @@
   border: 1px solid var(--button-border-color);
 }
 
-.modulator img.graph {
-  max-width: 33.3%;
+/* modulator */
+.modulators {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  width: 100vw;
+}
+.modulator-data {
+  display: flex;
+  border: 1px solid var(--button-border-color);
+  padding: 10px;
+  margin: 10px;
+  width: 48%;
+  max-width: 48%;
+}
+.modulator-data .shape {
+  min-width: 90%;
+}
+
+.modulator-data .modulator,
+.modulator-data .next {
+  display: flex;
+  flex-direction: column;
+}
+.modulator .lfo,
+.modulator .envelope {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.modulator .lfo {
+  padding-bottom: 10px;
+}
+.modulator .params fieldset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 0;
+  padding: 0;
+  margin: 0 10px;
+}
+.modulator .params label {
+  display: block;
+  white-space: nowrap;
+}
+.modulator .params input[type="number"] + span {
+  padding-left: 0.2em;
+}
+.modulator-data .next {
+  margin-left: 10px;
+  white-space: nowrap;
 }

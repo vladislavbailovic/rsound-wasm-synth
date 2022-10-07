@@ -18,11 +18,11 @@ export const Modulators = ({
 }: {
   modulators: ModulatorRawData[]
 }): JSX.Element => (
-  <>
+  <div className="modulators">
     {modulators.map((mod, idx) => (
       <Modulator key={idx} modulator={mod} idx={idx} />
     ))}
-  </>
+  </div>
 );
 
 const Modulator = ({
@@ -62,48 +62,52 @@ const Modulator = ({
   }
 
   return (
-    <div className="link modulator">
-      <div className="shape">
-        <Display src={tempUrl} />
-      </div>
-      <div className="params">
-        <fieldset>
-          <title>
-            {operation} {kind}
-          </title>
+    <div className="modulator-data">
+      <div className="modulator">
+        <div className="lfo">
+          <div className="shape">
+            <Display src={tempUrl} />
+          </div>
+          <div className="params">
+            <fieldset>
+              <title>
+                {operation} {kind}
+              </title>
 
-          {Object.entries(Oscillator)
-            .filter(([key, val]) => !isNaN(Number(val)))
-            .map(([key, val]) => {
-              const rkey = `${key}-${Number(val)}`;
-              const name = `shape-${idx}`;
-              return (
-                <label key={rkey}>
-                  <input
-                    type="radio"
-                    name={name}
-                    onChange={(e) => changeShape(Number(val))}
-                    value={Number(val)}
-                    checked={Number(val) === modulator.shape}
-                  />
-                  <span>{key}</span>
-                </label>
-              );
-            })}
+              {Object.entries(Oscillator)
+                .filter(([key, val]) => !isNaN(Number(val)))
+                .map(([key, val]) => {
+                  const rkey = `${key}-${Number(val)}`;
+                  const name = `shape-${idx}`;
+                  return (
+                    <label key={rkey}>
+                      <input
+                        type="radio"
+                        name={name}
+                        onChange={(e) => changeShape(Number(val))}
+                        value={Number(val)}
+                        checked={Number(val) === modulator.shape}
+                      />
+                      <span>{key}</span>
+                    </label>
+                  );
+                })}
 
-          <label>
-            <input
-              type="number"
-              value={modulator.freq}
-              onChange={(e) => changeFreq(Number(e.target.value))}
-              min="20"
-              max="20000"
-            />
-            <span>Hz</span>
-          </label>
-        </fieldset>
+              <label>
+                <input
+                  type="number"
+                  value={modulator.freq}
+                  onChange={(e) => changeFreq(Number(e.target.value))}
+                  min="20"
+                  max="20000"
+                />
+                <span>Hz</span>
+              </label>
+            </fieldset>
+          </div>
+        </div>
+        {envelope}
       </div>
-      {envelope}
       <Next idx={idx} del={del} />
     </div>
   );
@@ -151,8 +155,8 @@ const Envelope = ({
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
   return (
-    <div>
-      <div className="envelope">
+    <div className="envelope">
+      <div className="shape">
         <Display src={tempUrl} />
       </div>
       <div className="params">
