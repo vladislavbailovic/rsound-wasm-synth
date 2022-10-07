@@ -44,10 +44,25 @@ pub fn draw_oscillator() -> Vec<u8> {
 #[wasm_bindgen]
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
+    // Ten cycles at 20Hz
+    let cap_size = (1.0 / 20.0) * SAMPLE_RATE as f64 * 5.0;
 
     let freq = modulator.freq as f64;
+    let sample_len = {
+        let duration = if let Some(env) = modulator.env {
+            let envelope: Box<dyn envelope::Envelope> = env.into();
+            // Two ELFO envelope repeat cycles
+            envelope.min() * SAMPLE_RATE as f64 * 2.0
+        } else {
+            cap_size
+        };
+        if duration > cap_size {
+            cap_size
+        } else {
+            duration
+        }
+    } as usize;
     let osc: Box<dyn Signal> = modulator.into();
-    let sample_len = 1000;
     let mut data = vec![0.0; sample_len];
     for i in 0..sample_len {
         let t = i as f64 / SAMPLE_RATE as f64;
@@ -89,7 +104,7 @@ pub fn get_synth_sound(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f64> {
     };
     let n = Note::Tone(pc, Octave::C3, val![1 / 4]);
 
-    let envelope = envelope::ASR::new(0.015, 0.07, 0.2);
+    let envelope = envelope::ASR::new(0.015, 0.7, 0.2);
     let mut chain = match base {
         1 => generator::chain::Chain::new(Oscillator::Square),
         _ => generator::chain::Chain::new(Oscillator::Sine),
