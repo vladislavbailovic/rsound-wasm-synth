@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
-mod modulator;
-pub use modulator::*;
+mod syntherpreter;
+pub use syntherpreter::*;
 
 #[wasm_bindgen]
 extern "C" {
