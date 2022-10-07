@@ -6,6 +6,7 @@ import {
   draw_env,
   Oscillator,
   EnvelopeFactory,
+  EnvelopeKind,
   ModulatorKind,
   ModulatorOp,
   ModulatorRawData
@@ -52,7 +53,6 @@ const Modulator = ({
   const changeShape = (shape: Oscillator): void => {
     const modulators = [...synthCtx.data.modulators];
     modulators[idx].shape = shape;
-    console.log(shape, modulators);
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
 
@@ -120,12 +120,90 @@ const Envelope = ({
   if (envelope == null) {
     return null;
   }
+  const name = EnvelopeKind[envelope.kind];
   const graph = draw_env(envelope);
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
+
+  const synthCtx = useContext(SynthDataContext);
+  const changeDelay = (ms: number): void => {
+    const modulators = [...synthCtx.data.modulators];
+    envelope.delay = ms;
+    modulators[idx].env = envelope;
+    synthCtx.setData({ ...synthCtx.data, modulators });
+  };
+  const changeAttack = (ms: number): void => {
+    const modulators = [...synthCtx.data.modulators];
+    envelope.attack = ms;
+    modulators[idx].env = envelope;
+    synthCtx.setData({ ...synthCtx.data, modulators });
+  };
+  const changeSustain = (ms: number): void => {
+    const modulators = [...synthCtx.data.modulators];
+    envelope.sustain = ms;
+    modulators[idx].env = envelope;
+    synthCtx.setData({ ...synthCtx.data, modulators });
+  };
+  const changeRelease = (ms: number): void => {
+    const modulators = [...synthCtx.data.modulators];
+    envelope.release = ms;
+    modulators[idx].env = envelope;
+    synthCtx.setData({ ...synthCtx.data, modulators });
+  };
   return (
-    <div className="envelope">
-      <Display src={tempUrl} />
+    <div>
+      <div className="envelope">
+        <Display src={tempUrl} />
+      </div>
+      <div className="params">
+        <fieldset>
+          <title>{name}</title>
+
+          <label>
+            <input
+              type="number"
+              onChange={(e) => changeDelay(Number(e.target.value))}
+              value={envelope.delay}
+              min="20"
+              max="20000"
+            />
+            <span>ms</span>
+          </label>
+
+          <label>
+            <input
+              type="number"
+              onChange={(e) => changeAttack(Number(e.target.value))}
+              value={envelope.attack}
+              min="20"
+              max="20000"
+            />
+            <span>ms</span>
+          </label>
+
+          <label>
+            <input
+              type="number"
+              value={envelope.sustain}
+              onChange={(e) => changeSustain(Number(e.target.value))}
+              min="20"
+              max="20000"
+            />
+            <span>ms</span>
+          </label>
+
+          <label>
+            <input
+              type="number"
+              value={envelope.release}
+              onChange={(e) => changeRelease(Number(e.target.value))}
+              min="20"
+              max="20000"
+            />
+            <span>ms</span>
+          </label>
+        </fieldset>
+      </div>
     </div>
   );
 };

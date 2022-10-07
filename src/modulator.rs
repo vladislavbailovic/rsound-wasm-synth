@@ -55,6 +55,11 @@ impl ModulatorRawData {
         self.shape = shape as i32;
     }
 
+    #[wasm_bindgen(setter)]
+    pub fn set_env(&mut self, env: EnvelopeRawData) {
+        self.env = Some(env);
+    }
+
     fn to_lfo(&self) -> instrument::lfo::LFO {
         match self.shape.into() {
             Oscillator::Sine => instrument::lfo::LFO::sine(self.freq as f64),
@@ -101,6 +106,26 @@ pub struct EnvelopeRawData {
     pub sustain: Option<i32>,
     #[wasm_bindgen(readonly)]
     pub release: Option<i32>,
+}
+
+#[wasm_bindgen]
+impl EnvelopeRawData {
+    #[wasm_bindgen(setter)]
+    pub fn set_delay(&mut self, ms: i32) {
+        self.delay = Some(ms);
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_attack(&mut self, ms: i32) {
+        self.attack = Some(ms);
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_sustain(&mut self, ms: i32) {
+        self.sustain = Some(ms);
+    }
+    #[wasm_bindgen(setter)]
+    pub fn set_release(&mut self, ms: i32) {
+        self.release = Some(ms);
+    }
 }
 
 impl Default for EnvelopeRawData {
