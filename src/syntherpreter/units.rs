@@ -1,8 +1,8 @@
 use crate::SAMPLE_RATE;
 use std::ops::Deref;
 
-#[derive(PartialEq, Debug)]
-pub struct Hz(f64);
+#[derive(PartialEq, Debug, Clone)]
+pub struct Hz(pub f64);
 
 impl Deref for Hz {
     type Target = f64;
@@ -17,8 +17,17 @@ impl From<Hz> for i32 {
     }
 }
 
-#[derive(PartialEq, Debug)]
-pub struct Secs(f64);
+impl Hz {
+    pub fn as_secs(&self) -> Secs {
+        self.clone().into()
+    }
+    pub fn as_samples(&self) -> Samples {
+        self.as_secs().into()
+    }
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct Secs(pub f64);
 
 impl Deref for Secs {
     type Target = f64;
@@ -39,8 +48,14 @@ impl From<Hz> for Secs {
     }
 }
 
+impl Secs {
+    pub fn as_samples(&self) -> Samples {
+        self.clone().into()
+    }
+}
+
 #[derive(PartialEq, Debug)]
-pub struct Samples(f64);
+pub struct Samples(pub f64);
 
 impl Deref for Samples {
     type Target = f64;
@@ -89,6 +104,7 @@ mod hz {
         let hz = Hz(2.0);
         let secs: Secs = hz.into();
         assert_eq!(secs, Secs(0.5));
+        assert_eq!(secs, hz.secs());
 
         let hz = Hz(4.0);
         let secs: Secs = hz.into();

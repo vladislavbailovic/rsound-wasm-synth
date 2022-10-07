@@ -32,15 +32,16 @@ pub fn draw(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<u8> {
 #[wasm_bindgen]
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
-    // Ten cycles at 20Hz
-    let cap_size = (1.0 / 20.0) * SAMPLE_RATE as f64 * 5.0;
+    let cycle: Samples = Hz(20.0).as_samples();
+    let cap_size = *cycle * 5.0;
 
     let freq = modulator.freq as f64;
     let sample_len = {
         let duration = if let Some(env) = modulator.env {
             let envelope: Box<dyn envelope::Envelope> = env.into();
             // Two ELFO envelope repeat cycles
-            envelope.min() * SAMPLE_RATE as f64 * 2.0
+            let cycle: Samples = Secs(envelope.min()).as_samples();
+            *cycle * 2.0
         } else {
             cap_size
         };
@@ -53,8 +54,8 @@ pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let osc: Box<dyn Signal> = modulator.into();
     let mut data = vec![0.0; sample_len];
     for i in 0..sample_len {
-        let t = i as f64 / SAMPLE_RATE as f64;
-        data[i] = osc.value_at(t, freq);
+        let t: Secs = Samples(i as f64).into();
+        data[i] = osc.value_at(*t, freq);
     }
 
     graph(&data)
@@ -64,12 +65,12 @@ pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
 pub fn draw_env(raw: JsValue) -> Vec<u8> {
     let data: EnvelopeRawData = serde_wasm_bindgen::from_value(raw).unwrap();
     let env: &Box<dyn envelope::Envelope> = &data.into();
-    let sample_len = (SAMPLE_RATE as f64 * env.min()) as usize;
+    let sample_len = *Secs(env.min()).as_samples() as usize;
     // TODO: handle zero-length sample_len (E.g. for fixed)
     let mut result = vec![0.0; sample_len];
     for i in 0..sample_len {
-        let t = i as f64 / SAMPLE_RATE as f64;
-        result[i] = env.value_at(t, 1.0);
+        let t: Secs = Samples(i as f64).into();
+        result[i] = env.value_at(*t, 1.0);
     }
     graph(&result)
 }
@@ -139,20 +140,4 @@ fn graph(sound: &[f64]) -> Vec<u8> {
     }
 
     out
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_gets_lfo() {
-        let _x = ModulatorRawData {
-            op: 0,
-            kind: 0,
-            shape: 2,
-            freq: 220,
-            env: None,
-        };
-    }
 }
