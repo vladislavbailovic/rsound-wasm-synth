@@ -163,7 +163,7 @@ const Envelope = ({
             <input
               type="number"
               onChange={(e) => changeDelay(Number(e.target.value))}
-              value={envelope.delay}
+              value={envelope.delay !== undefined ? envelope.delay : 0}
               min="0"
               max="1000"
             />
