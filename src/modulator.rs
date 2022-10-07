@@ -112,7 +112,13 @@ pub struct EnvelopeRawData {
 impl EnvelopeRawData {
     #[wasm_bindgen(setter)]
     pub fn set_delay(&mut self, ms: i32) {
-        self.delay = Some(ms);
+        if ms > 0 {
+            self.delay = Some(ms);
+            self.kind = EnvelopeKind::from(self.kind).delayed() as i32;
+        } else {
+            self.delay = None;
+            self.kind = EnvelopeKind::from(self.kind).non_delayed() as i32;
+        }
     }
     #[wasm_bindgen(setter)]
     pub fn set_attack(&mut self, ms: i32) {
@@ -141,6 +147,7 @@ impl Default for EnvelopeRawData {
 }
 
 #[wasm_bindgen]
+#[derive(Copy, Clone)]
 pub enum EnvelopeKind {
     Fixed,
     RAR,
@@ -150,13 +157,31 @@ pub enum EnvelopeKind {
 }
 
 impl From<i32> for EnvelopeKind {
-    fn from(x: i32) -> EnvelopeKind {
+    fn from(x: i32) -> Self {
         match x {
             1 => EnvelopeKind::RAR,
             2 => EnvelopeKind::DRAR,
             3 => EnvelopeKind::ASR,
             4 => EnvelopeKind::DASR,
             _ => EnvelopeKind::Fixed,
+        }
+    }
+}
+
+impl EnvelopeKind {
+    fn delayed(&self) -> Self {
+        match self {
+            EnvelopeKind::RAR => EnvelopeKind::DRAR,
+            EnvelopeKind::ASR => EnvelopeKind::DASR,
+            _ => *self,
+        }
+    }
+
+    fn non_delayed(&self) -> Self {
+        match self {
+            EnvelopeKind::DRAR => EnvelopeKind::RAR,
+            EnvelopeKind::DASR => EnvelopeKind::ASR,
+            _ => *self,
         }
     }
 }

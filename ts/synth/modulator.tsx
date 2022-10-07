@@ -164,8 +164,8 @@ const Envelope = ({
               type="number"
               onChange={(e) => changeDelay(Number(e.target.value))}
               value={envelope.delay}
-              min="20"
-              max="20000"
+              min="0"
+              max="1000"
             />
             <span>ms</span>
           </label>
@@ -175,8 +175,8 @@ const Envelope = ({
               type="number"
               onChange={(e) => changeAttack(Number(e.target.value))}
               value={envelope.attack}
-              min="20"
-              max="20000"
+              min="0"
+              max="1000"
             />
             <span>ms</span>
           </label>
@@ -186,8 +186,8 @@ const Envelope = ({
               type="number"
               value={envelope.sustain}
               onChange={(e) => changeSustain(Number(e.target.value))}
-              min="20"
-              max="20000"
+              min="0"
+              max="1000"
             />
             <span>ms</span>
           </label>
@@ -197,8 +197,8 @@ const Envelope = ({
               type="number"
               value={envelope.release}
               onChange={(e) => changeRelease(Number(e.target.value))}
-              min="20"
-              max="20000"
+              min="0"
+              max="1000"
             />
             <span>ms</span>
           </label>
