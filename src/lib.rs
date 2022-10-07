@@ -30,18 +30,6 @@ pub fn draw(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<u8> {
 }
 
 #[wasm_bindgen]
-pub fn draw_oscillator() -> Vec<u8> {
-    let sample_len = 1000;
-    let osc = oscillator::Oscillator::Sine;
-    let mut result = vec![0.0; sample_len];
-    for i in 0..sample_len {
-        let t = i as f64 / SAMPLE_RATE as f64;
-        result[i] = osc.get(440.0).at(t);
-    }
-    graph(&result)
-}
-
-#[wasm_bindgen]
 pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
     let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
     // Ten cycles at 20Hz
