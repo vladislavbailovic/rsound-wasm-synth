@@ -5,6 +5,11 @@ import { SynthDataContext, SynthData } from './data';
 import { Player, PlayerContext } from './player';
 
 import init, {
+  InstrumentRawData,
+  GeneratorType,
+  SynthParamType,
+  SynthParam,
+  Oscillator,
   ModulatorRawData,
   ModulatorKind,
   EnvelopeFactory
@@ -15,8 +20,14 @@ const ContextProvider = ({
 }: {
   children: JSX.Element
 }): JSX.Element => {
+  const instrument = new InstrumentRawData(
+    GeneratorType.Chain,
+    EnvelopeFactory.ASR(13, 161, 12)
+  );
   const synth = {
     tone: 0,
+    instrument,
+    params: [new SynthParam(SynthParamType.Oscillator, Oscillator.Triangle)],
     modulators: [
       new ModulatorRawData(
         undefined,

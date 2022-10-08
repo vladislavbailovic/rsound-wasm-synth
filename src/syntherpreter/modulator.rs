@@ -1,7 +1,7 @@
-use super::EnvelopeRawData;
-use instrument::{envelope, oscillator::Oscillator};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
+use instrument::{envelope, oscillator::Oscillator};
+use super::EnvelopeRawData;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[wasm_bindgen]

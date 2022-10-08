@@ -4,3 +4,5 @@ mod modulator;
 pub use modulator::*;
 mod envelope;
 pub use envelope::*;
+mod synth;
+pub use synth::*;

@@ -6,6 +6,10 @@ PYTHON=$(shell command -v python || echo "python3")
 run: www node_modules
 	cd www && pwd && $(PYTHON) -m http.server 6660
 
+rebuild:
+	rm -rf pkg/ build/ www/
+	make www
+
 node_modules: package.json package-lock.json
 	npm i
 

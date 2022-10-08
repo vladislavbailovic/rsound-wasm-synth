@@ -9,7 +9,14 @@ export const Synth = ({ type }: { type: string }): JSX.Element => {
   const synthCtx = useContext(SynthDataContext);
 
   const cls = ['synth'].concat([type]).join(' ');
-  const graph = draw(synthCtx.data.tone, 0, synthCtx.data.modulators);
+  console.log('sending instrument to rust', synthCtx.data.instrument);
+  console.log('sending synth params to rust', synthCtx.data.params);
+  const graph = draw(
+    synthCtx.data.tone,
+    synthCtx.data.instrument,
+    synthCtx.data.params,
+    synthCtx.data.modulators
+  );
   const blob = new Blob([graph], { type: 'image/svg+xml' });
   const tempUrl = window.URL.createObjectURL(blob);
   return (
