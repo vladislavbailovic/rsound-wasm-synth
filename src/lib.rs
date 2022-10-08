@@ -26,27 +26,56 @@ pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
 #[wasm_bindgen]
 pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsValue>) -> Vec<u8> {
     let data: InstrumentRawData = serde_wasm_bindgen::from_value(instrument).unwrap();
+
     let mut parsed = Vec::new();
     for param in params {
         let p: SynthParam = serde_wasm_bindgen::from_value(param.clone()).unwrap();
         parsed.push(p);
     }
-    console_log(&format!("parsed params: {:?}", &parsed));
 
     let envelope: Box<dyn envelope::Envelope> = data.envelope.into();
     let generator_type: GeneratorType = data.generator.into();
     let generator: Box<dyn generator::Generator> = match generator_type {
-        // GeneratorType::Chain => {
-        // },
+        GeneratorType::Chain => {
+            let osc: Oscillator = parsed
+                .iter()
+                .filter_map(|x| {
+                    let kind: SynthParamType = x.kind.into();
+                    if kind == SynthParamType::Oscillator {
+                        Some(x.value)
+                    } else {
+                        None
+                    }
+                })
+                .nth(0)
+                .unwrap_or(Some(Oscillator::Sine as i32))
+                .unwrap()
+                .into();
+            let mut synth = generator::chain::Chain::new(osc);
+            for raw in mods {
+                let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
+                match modulator.op.into() {
+                    ModulatorOp::Add => synth.add_box(modulator.into()),
+                    ModulatorOp::Sub => synth.sub_box(modulator.into()),
+                };
+            }
+            Box::new(synth)
+        }
         _ => {
-            let osc: Oscillator = parsed.iter().filter_map(|x| {
-                let kind: SynthParamType = x.kind.into();
-                if kind == SynthParamType::Oscillator {
-                    Some(x.value)
-                } else {
-                    None
-                }
-            }).nth(0).unwrap_or(Some(Oscillator::Sine as i32)).unwrap().into();
+            let osc: Oscillator = parsed
+                .iter()
+                .filter_map(|x| {
+                    let kind: SynthParamType = x.kind.into();
+                    if kind == SynthParamType::Oscillator {
+                        Some(x.value)
+                    } else {
+                        None
+                    }
+                })
+                .nth(0)
+                .unwrap_or(Some(Oscillator::Sine as i32))
+                .unwrap()
+                .into();
             Box::new(generator::simple::Simple::new(osc))
         }
     };
@@ -54,8 +83,6 @@ pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
     let n = Note::Tone(PitchClass::A, Octave::C3, val![1 / 4]);
     let sound = synth.play(90.0, n, 1.0);
     graph(&sound)
-
-    // let sound = get_synth_sound(tone, 0, mods);
 }
 
 #[wasm_bindgen]

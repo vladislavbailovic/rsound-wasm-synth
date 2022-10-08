@@ -1,6 +1,6 @@
+use super::EnvelopeRawData;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-use super::EnvelopeRawData;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[wasm_bindgen(getter_with_clone)]
@@ -24,7 +24,10 @@ impl Default for InstrumentRawData {
 impl InstrumentRawData {
     #[wasm_bindgen(constructor)]
     pub fn new(generator: GeneratorType, envelope: EnvelopeRawData) -> Self {
-        Self { generator: generator as i32, envelope }
+        Self {
+            generator: generator as i32,
+            envelope,
+        }
     }
 
     #[wasm_bindgen]
@@ -64,7 +67,10 @@ pub struct SynthParam {
 impl SynthParam {
     #[wasm_bindgen(constructor)]
     pub fn new(kind: SynthParamType, value: Option<i32>) -> Self {
-        Self{ kind: kind as i32, value }
+        Self {
+            kind: kind as i32,
+            value,
+        }
     }
 }
 
