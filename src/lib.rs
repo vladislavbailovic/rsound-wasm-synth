@@ -32,25 +32,13 @@ pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
         let p: SynthParam = serde_wasm_bindgen::from_value(param.clone()).unwrap();
         parsed.push(p);
     }
+    let synth_params = SynthParams::new(&parsed);
 
     let envelope: Box<dyn envelope::Envelope> = data.envelope.into();
     let generator_type: GeneratorType = data.generator.into();
     let generator: Box<dyn generator::Generator> = match generator_type {
         GeneratorType::Chain => {
-            let osc: Oscillator = parsed
-                .iter()
-                .filter_map(|x| {
-                    let kind: SynthParamType = x.kind.into();
-                    if kind == SynthParamType::Oscillator {
-                        Some(x.value)
-                    } else {
-                        None
-                    }
-                })
-                .nth(0)
-                .unwrap_or(Some(Oscillator::Sine as i32))
-                .unwrap()
-                .into();
+            let osc = synth_params.oscillator();
             let mut synth = generator::chain::Chain::new(osc);
             for raw in mods {
                 let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
@@ -62,20 +50,7 @@ pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
             Box::new(synth)
         }
         _ => {
-            let osc: Oscillator = parsed
-                .iter()
-                .filter_map(|x| {
-                    let kind: SynthParamType = x.kind.into();
-                    if kind == SynthParamType::Oscillator {
-                        Some(x.value)
-                    } else {
-                        None
-                    }
-                })
-                .nth(0)
-                .unwrap_or(Some(Oscillator::Sine as i32))
-                .unwrap()
-                .into();
+            let osc = synth_params.oscillator();
             Box::new(generator::simple::Simple::new(osc))
         }
     };
