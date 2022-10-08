@@ -26,50 +26,19 @@ pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
 #[wasm_bindgen]
 pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsValue>) -> Vec<u8> {
     let data: InstrumentRawData = serde_wasm_bindgen::from_value(instrument).unwrap();
+    let mut terp = Syntherpreter::new(data);
 
-    let mut parsed = Vec::new();
     for param in params {
         let p: SynthParam = serde_wasm_bindgen::from_value(param.clone()).unwrap();
-        parsed.push(p);
+        terp.synth_params.push(p);
     }
-    let synth_params = SynthParams::new(&parsed);
+    for modulator in mods {
+        let m: ModulatorRawData = serde_wasm_bindgen::from_value(modulator).unwrap();
+        terp.modulators.push(m);
+    }
 
-    let envelope: Box<dyn envelope::Envelope> = data.envelope.into();
-    let generator_type: GeneratorType = data.generator.into();
-    let generator: Box<dyn generator::Generator> = match generator_type {
-        GeneratorType::Detuned => {
-            let osc = synth_params.oscillator();
-            let synth: Box<dyn generator::Generator> =
-                if let Some(semis) = synth_params.value(SynthParamType::DetuneSemitones) {
-                    Box::new(generator::detuned::Semitones::new(osc, semis))
-                } else {
-                    let freq = if let Some(hz) = synth_params.value(SynthParamType::DetuneHz) {
-                        hz
-                    } else {
-                        20
-                    };
-                    Box::new(generator::detuned::Freq::new(osc, freq as f64))
-                };
-            synth
-        }
-        GeneratorType::Chain => {
-            let osc = synth_params.oscillator();
-            let mut synth = generator::chain::Chain::new(osc);
-            for raw in mods {
-                let modulator: ModulatorRawData = serde_wasm_bindgen::from_value(raw).unwrap();
-                match modulator.op.into() {
-                    ModulatorOp::Add => synth.add_box(modulator.into()),
-                    ModulatorOp::Sub => synth.sub_box(modulator.into()),
-                };
-            }
-            Box::new(synth)
-        }
-        _ => {
-            let osc = synth_params.oscillator();
-            Box::new(generator::simple::Simple::new(osc))
-        }
-    };
-    let synth = instrument::Instrument::new_boxed(generator, envelope);
+    let synth = terp.get_synth();
+
     let n = Note::Tone(PitchClass::A, Octave::C3, val![1 / 4]);
     let sound = synth.play(90.0, n, 1.0);
     graph(&sound)
@@ -106,7 +75,7 @@ pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
 #[wasm_bindgen]
 pub fn draw_env(raw: JsValue) -> Vec<u8> {
     let data: EnvelopeRawData = serde_wasm_bindgen::from_value(raw).unwrap();
-    let env: &Box<dyn envelope::Envelope> = &data.into();
+    let env: Box<dyn envelope::Envelope> = data.into();
     let sample_len = *Secs(env.min()).as_samples() as usize;
     // TODO: handle zero-length sample_len (E.g. for fixed)
     let mut result = vec![0.0; sample_len];

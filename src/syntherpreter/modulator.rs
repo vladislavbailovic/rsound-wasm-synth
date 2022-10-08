@@ -3,7 +3,7 @@ use instrument::{envelope, oscillator::Oscillator};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[wasm_bindgen]
 pub struct ModulatorRawData {
     #[wasm_bindgen(readonly)]

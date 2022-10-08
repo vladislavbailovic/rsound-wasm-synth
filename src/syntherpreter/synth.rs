@@ -91,33 +91,3 @@ impl From<i32> for SynthParamType {
         }
     }
 }
-
-pub struct SynthParams<'a> {
-    data: &'a [SynthParam],
-}
-impl<'a> SynthParams<'a> {
-    pub fn new(data: &'a [SynthParam]) -> Self {
-        Self { data }
-    }
-
-    pub fn value(&self, kind: SynthParamType) -> Option<i32> {
-        self.data
-            .iter()
-            .filter_map(|x| {
-                let xkind: SynthParamType = x.kind.into();
-                if xkind == kind {
-                    Some(x.value)
-                } else {
-                    None
-                }
-            })
-            .nth(0)
-            .unwrap_or(None)
-    }
-
-    pub fn oscillator(&self) -> instrument::oscillator::Oscillator {
-        self.value(SynthParamType::Oscillator)
-            .unwrap_or(instrument::oscillator::Oscillator::Sine as i32)
-            .into()
-    }
-}
