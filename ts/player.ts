@@ -50,9 +50,15 @@ export class Player {
         if (this.gainNode == null) {
           return;
         }
+        const instrument =
+          this.synthData != null ? this.synthData.instrument : null;
+        if (instrument == null) {
+          return;
+        }
+        const params = this.synthData != null ? this.synthData.params : [];
         const modulators =
           this.synthData != null ? this.synthData.modulators : [];
-        const result = play(tone, 0, modulators);
+        const result = play(tone, instrument, params, modulators);
         const buffer = this.audioCtx.createBuffer(1, result.length, 44100);
         buffer.copyToChannel(result, 0);
 

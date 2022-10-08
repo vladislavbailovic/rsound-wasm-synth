@@ -16,10 +16,29 @@ use note::*;
 use rsound_output::Buffer; // TODO: refactor PcmRenderer into f32 buffer getter for web audio and
                            // add it here
 
-#[wasm_bindgen]
-pub fn play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
+pub fn _play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
     let sound = get_synth_sound(tone, base, mods);
     graph(&sound);
+    sound.iter().map(|&x| x as f32).collect()
+}
+#[wasm_bindgen]
+pub fn play(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsValue>) -> Vec<f32> {
+    let data: InstrumentRawData = serde_wasm_bindgen::from_value(instrument).unwrap();
+    let mut terp = Syntherpreter::new(data);
+
+    for param in params {
+        let p: SynthParam = serde_wasm_bindgen::from_value(param.clone()).unwrap();
+        terp.synth_params.push(p);
+    }
+    for modulator in mods {
+        let m: ModulatorRawData = serde_wasm_bindgen::from_value(modulator).unwrap();
+        terp.modulators.push(m);
+    }
+
+    let synth = terp.get_synth();
+
+    let n = Note::Tone(PitchClass::A, Octave::C3, val![1 / 4]);
+    let sound = synth.play(90.0, n, 1.0);
     sound.iter().map(|&x| x as f32).collect()
 }
 
