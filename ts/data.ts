@@ -1,12 +1,13 @@
 import { createContext } from 'react';
 import {
+  ToneData,
   ModulatorRawData,
   InstrumentRawData,
   SynthParam
 } from '../pkg/rsound_wasm_synth';
 
 export class SynthData {
-  tone: number = 0;
+  tone: ToneData | null = null;
   instrument: InstrumentRawData | null = null;
   params: SynthParam[] = [];
   modulators: ModulatorRawData[] = [];

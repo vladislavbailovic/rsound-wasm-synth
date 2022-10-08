@@ -91,3 +91,33 @@ impl From<i32> for SynthParamType {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[wasm_bindgen]
+pub struct ToneData {
+    #[wasm_bindgen(readonly)]
+    pub pitch: i32,
+    #[wasm_bindgen(readonly)]
+    pub octave: i32,
+}
+
+#[wasm_bindgen]
+impl ToneData {
+    #[wasm_bindgen(constructor)]
+    pub fn new(pitch: note::PitchClass, octave: note::Octave) -> Self {
+        Self {
+            pitch: pitch as i32,
+            octave: octave as i32,
+        }
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_pitch(&mut self, pitch: note::PitchClass) {
+        self.pitch = pitch as i32;
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_octave(&mut self, octave: note::Octave) {
+        self.octave = octave as i32;
+    }
+}

@@ -16,13 +16,14 @@ use note::*;
 use rsound_output::Buffer; // TODO: refactor PcmRenderer into f32 buffer getter for web audio and
                            // add it here
 
-pub fn _play(tone: i32, base: i32, mods: Vec<JsValue>) -> Vec<f32> {
-    let sound = get_synth_sound(tone, base, mods);
-    graph(&sound);
-    sound.iter().map(|&x| x as f32).collect()
-}
 #[wasm_bindgen]
-pub fn play(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsValue>) -> Vec<f32> {
+pub fn play(
+    tone: JsValue,
+    instrument: JsValue,
+    params: Vec<JsValue>,
+    mods: Vec<JsValue>,
+) -> Vec<f32> {
+    let tone: ToneData = serde_wasm_bindgen::from_value(tone).unwrap();
     let data: InstrumentRawData = serde_wasm_bindgen::from_value(instrument).unwrap();
     let mut terp = Syntherpreter::new(data);
 
@@ -37,13 +38,19 @@ pub fn play(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
 
     let synth = terp.get_synth();
 
-    let n = Note::Tone(PitchClass::A, Octave::C3, val![1 / 4]);
+    let n = Note::Tone(tone.pitch.into(), tone.octave.into(), val![1 / 4]);
     let sound = synth.play(90.0, n, 1.0);
     sound.iter().map(|&x| x as f32).collect()
 }
 
 #[wasm_bindgen]
-pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsValue>) -> Vec<u8> {
+pub fn draw(
+    tone: JsValue,
+    instrument: JsValue,
+    params: Vec<JsValue>,
+    mods: Vec<JsValue>,
+) -> Vec<u8> {
+    let tone: ToneData = serde_wasm_bindgen::from_value(tone).unwrap();
     let data: InstrumentRawData = serde_wasm_bindgen::from_value(instrument).unwrap();
     let mut terp = Syntherpreter::new(data);
 
@@ -58,7 +65,7 @@ pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
 
     let synth = terp.get_synth();
 
-    let n = Note::Tone(PitchClass::A, Octave::C3, val![1 / 4]);
+    let n = Note::Tone(tone.pitch.into(), tone.octave.into(), val![1 / 4]);
     let sound = synth.play(90.0, n, 1.0);
     graph(&sound)
 }

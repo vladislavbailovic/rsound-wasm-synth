@@ -5,6 +5,9 @@ import { SynthDataContext, SynthData } from './data';
 import { Player, PlayerContext } from './player';
 
 import init, {
+  ToneData,
+  PitchClass,
+  Octave,
   InstrumentRawData,
   GeneratorType,
   SynthParamType,
@@ -25,7 +28,7 @@ const ContextProvider = ({
     EnvelopeFactory.ASR(13, 161, 12)
   );
   const synth = {
-    tone: 0,
+    tone: new ToneData(PitchClass.A, Octave.C3),
     instrument,
     params: [new SynthParam(SynthParamType.Oscillator, Oscillator.Triangle)],
     modulators: [

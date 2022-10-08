@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { SynthData } from './data';
-import { play } from '../pkg/rsound_wasm_synth';
+import { play, PitchClass } from '../pkg/rsound_wasm_synth';
 
 export class Player {
   audioCtx: AudioContext | null = null;
@@ -32,7 +32,7 @@ export class Player {
     this.synthData = data;
   }
 
-  play (tone: number): void {
+  play (tone: PitchClass): void {
     const ctx = this.get_ctx();
     if (ctx == null) {
       console.log('no context');
@@ -50,6 +50,11 @@ export class Player {
         if (this.gainNode == null) {
           return;
         }
+        const note = this.synthData != null ? this.synthData.tone : null;
+        if (note == null) {
+          return;
+        }
+        note.pitch = tone;
         const instrument =
           this.synthData != null ? this.synthData.instrument : null;
         if (instrument == null) {
@@ -58,7 +63,7 @@ export class Player {
         const params = this.synthData != null ? this.synthData.params : [];
         const modulators =
           this.synthData != null ? this.synthData.modulators : [];
-        const result = play(tone, instrument, params, modulators);
+        const result = play(note, instrument, params, modulators);
         const buffer = this.audioCtx.createBuffer(1, result.length, 44100);
         buffer.copyToChannel(result, 0);
 
