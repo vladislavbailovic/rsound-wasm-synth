@@ -44,11 +44,6 @@ pub fn draw_lfo(raw: JsValue) -> Vec<u8> {
             *cycle * 2.0
         } else {
             cap_size
-        };
-        if duration > cap_size {
-            cap_size
-        } else {
-            duration
         }
     } as usize;
     let osc: Box<dyn Signal> = modulator.into();
