@@ -100,20 +100,24 @@ impl<'a> SynthParams<'a> {
         Self { data }
     }
 
-    pub fn oscillator(&self) -> instrument::oscillator::Oscillator {
+    pub fn value(&self, kind: SynthParamType) -> Option<i32> {
         self.data
             .iter()
             .filter_map(|x| {
-                let kind: SynthParamType = x.kind.into();
-                if kind == SynthParamType::Oscillator {
+                let xkind: SynthParamType = x.kind.into();
+                if xkind == kind {
                     Some(x.value)
                 } else {
                     None
                 }
             })
             .nth(0)
-            .unwrap_or(Some(instrument::oscillator::Oscillator::Sine as i32))
-            .unwrap()
+            .unwrap_or(None)
+    }
+
+    pub fn oscillator(&self) -> instrument::oscillator::Oscillator {
+        self.value(SynthParamType::Oscillator)
+            .unwrap_or(instrument::oscillator::Oscillator::Sine as i32)
             .into()
     }
 }

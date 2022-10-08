@@ -37,6 +37,21 @@ pub fn draw(tone: i32, instrument: JsValue, params: Vec<JsValue>, mods: Vec<JsVa
     let envelope: Box<dyn envelope::Envelope> = data.envelope.into();
     let generator_type: GeneratorType = data.generator.into();
     let generator: Box<dyn generator::Generator> = match generator_type {
+        GeneratorType::Detuned => {
+            let osc = synth_params.oscillator();
+            let synth: Box<dyn generator::Generator> =
+                if let Some(semis) = synth_params.value(SynthParamType::DetuneSemitones) {
+                    Box::new(generator::detuned::Semitones::new(osc, semis))
+                } else {
+                    let freq = if let Some(hz) = synth_params.value(SynthParamType::DetuneHz) {
+                        hz
+                    } else {
+                        20
+                    };
+                    Box::new(generator::detuned::Freq::new(osc, freq as f64))
+                };
+            synth
+        }
         GeneratorType::Chain => {
             let osc = synth_params.oscillator();
             let mut synth = generator::chain::Chain::new(osc);

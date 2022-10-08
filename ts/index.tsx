@@ -21,7 +21,7 @@ const ContextProvider = ({
   children: JSX.Element
 }): JSX.Element => {
   const instrument = new InstrumentRawData(
-    GeneratorType.Chain,
+    GeneratorType.Detuned,
     EnvelopeFactory.ASR(13, 161, 12)
   );
   const synth = {
