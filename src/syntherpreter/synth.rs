@@ -30,6 +30,11 @@ impl InstrumentRawData {
         }
     }
 
+    #[wasm_bindgen(setter)]
+    pub fn set_generator(&mut self, g: GeneratorType) {
+        self.generator = g as i32;
+    }
+
     #[wasm_bindgen]
     pub fn simple() -> Self {
         InstrumentRawData::default()

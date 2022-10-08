@@ -2,32 +2,33 @@
   display: flex;
 }
 
-.link.source {
+.source {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   width: 50%;
   margin: 10px 0;
+  align-items: flex-start;
 }
 
 /* synth */
-.synth .link {
+.source {
   display: flex;
   margin: 5px;
   padding: 5px;
   border: 1px solid var(--button-border-color);
 }
-.synth .link .shape {
+.source .shape {
   display: flex;
   flex-direction: column;
 }
-.synth .link fieldset title {
+.source fieldset title {
   display: block;
 }
-.synth .link .params {
+.source .link .params {
   display: flex;
 }
-.synth .link .params fieldset {
+.source .params fieldset {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -35,19 +36,19 @@
   padding: 0;
   margin: 0 10px;
 }
-.synth .link .params label {
+.source .params label {
   display: block;
 }
-.link .params label span {
+.source .params label span {
   margin-left: 0.25rem;
 }
-.synth .link .next {
+.source .next {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   margin-left: 10px;
 }
-.link .next button {
+.source .next button {
   background: none;
   border: 1px solid var(--button-border-color);
 }
