@@ -1,26 +1,16 @@
-.synth.chain {
-  display: flex;
-}
-
+/* synth */
 .source {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  width: 50%;
-  margin: 10px 0;
+  width: 100%;
+  margin: 10px;
   align-items: flex-start;
-}
-
-/* synth */
-.source {
-  display: flex;
-  margin: 5px;
-  padding: 5px;
   border: 1px solid var(--button-border-color);
 }
-.source .shape {
+.source .synth {
+  margin: 10px;
   display: flex;
-  flex-direction: column;
 }
 .source fieldset title {
   display: block;
@@ -46,7 +36,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-left: 10px;
+  margin: 10px;
 }
 .source .next button {
   background: none;
@@ -57,22 +47,17 @@
 .modulators {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
   align-items: flex-start;
   width: 100vw;
 }
 .modulator-data {
   display: flex;
+  justify-content: space-between;
   border: 1px solid var(--button-border-color);
   padding: 10px;
   margin: 10px;
-  width: 48%;
-  max-width: 48%;
+  width: 48vw;
 }
-.modulator-data .shape {
-  min-width: 90%;
-}
-
 .modulator-data .modulator,
 .modulator-data .next {
   display: flex;
@@ -82,8 +67,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-.modulator .lfo {
   padding-bottom: 10px;
 }
 .modulator .params fieldset {
@@ -93,6 +76,9 @@
   border: 0;
   padding: 0;
   margin: 0 10px;
+}
+.modulator fieldset title {
+  display: block;
 }
 .modulator .params label {
   display: block;
@@ -104,4 +90,8 @@
 .modulator-data .next {
   margin-left: 10px;
   white-space: nowrap;
+}
+.modulator-data .next button {
+  background: none;
+  border: 1px solid var(--button-border-color);
 }

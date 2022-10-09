@@ -1,13 +1,17 @@
 img.graph {
   max-width: 100%;
-  min-width: 100%;
   display: block;
 }
 
 .display {
   display: flex;
+  justify-content: center;
   width: 100%;
   min-height: 150px;
   overflow: hidden;
   background: black;
+}
+
+.shape {
+  width: 36vw;
 }

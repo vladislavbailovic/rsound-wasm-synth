@@ -17,9 +17,6 @@ import './chain.css';
 export const Synth = ({ type }: { type: string }): JSX.Element => {
   const synthCtx = useContext(SynthDataContext);
 
-  const cls = ['synth'].concat([type]).join(' ');
-  console.log('sending instrument to rust', synthCtx.data.instrument);
-  console.log('sending synth params to rust', synthCtx.data.params);
   const graph = draw(
     synthCtx.data.tone,
     synthCtx.data.instrument,
@@ -31,12 +28,8 @@ export const Synth = ({ type }: { type: string }): JSX.Element => {
   return (
     <>
       <Display id="graph" src={tempUrl} />
-      <SourceEnvelope />
       <SynthSource />
-
-      <div className={cls}>
-        <Modulators modulators={synthCtx.data.modulators} />
-      </div>
+      <Modulators modulators={synthCtx.data.modulators} />
     </>
   );
 };
@@ -118,51 +111,54 @@ const SynthSource = (): JSX.Element | null => {
   };
   return (
     <div className="source">
-      <div className="params">
-        <fieldset>
-          <title>{GeneratorType[instrument.generator]}</title>
+      <div className="synth">
+        <SourceEnvelope />
+        <div className="params">
+          <fieldset>
+            <title>{GeneratorType[instrument.generator]}</title>
 
-          {Object.entries(GeneratorType)
-            .filter(([key, val]) => !isNaN(Number(val)))
-            .map(([key, val]) => {
-              const rkey = `${key}-${Number(val)}`;
-              return (
-                <label key={rkey}>
-                  <input
-                    type="radio"
-                    name="source-type"
-                    value={Number(val)}
-                    onChange={(e) => changeType(Number(val))}
-                    checked={Number(val) === instrument.generator}
-                  />
-                  <span>{key}</span>
-                </label>
-              );
-            })}
-        </fieldset>
-      </div>
+            {Object.entries(GeneratorType)
+              .filter(([key, val]) => !isNaN(Number(val)))
+              .map(([key, val]) => {
+                const rkey = `${key}-${Number(val)}`;
+                return (
+                  <label key={rkey}>
+                    <input
+                      type="radio"
+                      name="source-type"
+                      value={Number(val)}
+                      onChange={(e) => changeType(Number(val))}
+                      checked={Number(val) === instrument.generator}
+                    />
+                    <span>{key}</span>
+                  </label>
+                );
+              })}
+          </fieldset>
+        </div>
 
-      <div className="params">
-        <fieldset>
-          <title>{Oscillator[shape]}</title>
-          {Object.entries(Oscillator)
-            .filter(([key, val]) => !isNaN(Number(val)))
-            .map(([key, val]) => {
-              const rkey = `${key}-${Number(val)}`;
-              return (
-                <label key={rkey}>
-                  <input
-                    type="radio"
-                    name="source-shape"
-                    onChange={(e) => changeShape(Number(val))}
-                    value={Number(val)}
-                    checked={Number(val) === shape}
-                  />
-                  <span>{key}</span>
-                </label>
-              );
-            })}
-        </fieldset>
+        <div className="params">
+          <fieldset>
+            <title>{Oscillator[shape]}</title>
+            {Object.entries(Oscillator)
+              .filter(([key, val]) => !isNaN(Number(val)))
+              .map(([key, val]) => {
+                const rkey = `${key}-${Number(val)}`;
+                return (
+                  <label key={rkey}>
+                    <input
+                      type="radio"
+                      name="source-shape"
+                      onChange={(e) => changeShape(Number(val))}
+                      value={Number(val)}
+                      checked={Number(val) === shape}
+                    />
+                    <span>{key}</span>
+                  </label>
+                );
+              })}
+          </fieldset>
+        </div>
       </div>
       <Next />
     </div>
