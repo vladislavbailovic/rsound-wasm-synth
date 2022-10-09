@@ -10,7 +10,7 @@ import {
   ModulatorOp,
   ModulatorRawData
 } from '../../pkg/rsound_wasm_synth';
-import './chain.css';
+import './modulator.css';
 
 export const Modulators = ({
   modulators

@@ -1,0 +1,43 @@
+.source {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  margin: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--button-border-color);
+}
+.source .synth {
+  margin: 10px;
+  display: flex;
+}
+.source fieldset title {
+  display: block;
+}
+.source .link .params {
+  display: flex;
+}
+.source .params fieldset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 0;
+  padding: 0;
+  margin: 0 10px;
+}
+.source .params label {
+  display: block;
+}
+.source .params label span {
+  margin-left: 0.25rem;
+}
+.source .next {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 10px;
+}
+.source .next button {
+  background: none;
+  border: 1px solid var(--button-border-color);
+}

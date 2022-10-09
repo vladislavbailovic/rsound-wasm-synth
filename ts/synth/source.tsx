@@ -12,9 +12,9 @@ import {
   SynthParam,
   SynthParamType
 } from '../../pkg/rsound_wasm_synth';
-import './chain.css';
+import './source.css';
 
-export const Synth = ({ type }: { type: string }): JSX.Element => {
+export const Synth = (): JSX.Element => {
   const synthCtx = useContext(SynthDataContext);
 
   const graph = draw(
