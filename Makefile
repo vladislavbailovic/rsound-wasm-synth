@@ -10,6 +10,10 @@ rebuild:
 	rm -rf pkg/ build/ www/
 	make www
 
+format:
+	npx prettier ts webpack.config.js .eslintrc.js -w
+	npx eslint ts webpack.config.js .eslintrc.js --fix
+
 node_modules: package.json package-lock.json
 	npm i
 
@@ -33,6 +37,9 @@ www/build: $(TSFILES) $(TSXFILES) $(CSSFILES) Makefile node_modules
 	npx webpack
 	@touch $@
 
+css: $(CSSFILES)
+	cd ts && rsync -zarv --include "*/" --include="*.css" --exclude="*" "." "../build" && cd -
+
 csswatch: $(CSSFILES)
 	echo $(CSSFILES) | sed 's/ /\n/g' | while inotifywait -e modify,create,delete --fromfile - ; do \
 		echo ; \
@@ -51,4 +58,4 @@ tswatch: $(TSFILES) $(TSXFILES) Makefile node_modules package.json webpack.confi
 		--watch
 webpackwatch: build/*.js Makefile package.json webpack.config.js
 	npx webpack watch
-watch: ; ${MAKE} -j4 csswatch tswatch webpackwatch
+watch: ; ${MAKE} -j4 css csswatch tswatch webpackwatch
