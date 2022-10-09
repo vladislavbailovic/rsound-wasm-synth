@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { PitchClass } from '../pkg/rsound_wasm_synth';
+import { PitchClass, Octave, ToneData } from '../pkg/rsound_wasm_synth';
+import { SynthDataContext } from './data';
 import { PlayerContext } from './player';
 import './keyboard.css';
 
@@ -29,6 +30,11 @@ const OFFSET = BLACK.map((x) => Number(x) + 1);
 
 export const Keyboard = (): JSX.Element => {
   const player = useContext(PlayerContext);
+  const synthCtx = useContext(SynthDataContext);
+  const tone =
+    synthCtx.data.tone !== null
+      ? synthCtx.data.tone
+      : new ToneData(PitchClass.A, Octave.C3);
   const [activeKey, setActiveKey] = React.useState<PitchClass | null>(null);
   keypressListener(
     (e: any) => {
@@ -46,22 +52,47 @@ export const Keyboard = (): JSX.Element => {
       setActiveKey(-1);
     }
   );
+
+  const updateOctave = (x: Octave): void => {
+    const tone = new ToneData(PitchClass.A, x);
+    synthCtx.setData({ ...synthCtx.data, tone });
+  };
+
   return (
-    <div className="piano">
-      {Object.entries(PitchClass)
+    <div className="tone-data">
+      {Object.entries(Octave)
         .filter(([key, val]) => !isNaN(Number(val)))
         .map(([key, val]) => {
-          const idx = `${key}-${Number(val)}`;
+          const rkey = `octave-${Number(val)}`;
           return (
-            <Key
-              key={idx}
-              name={key}
-              idx={Number(val)}
-              activate={player.play}
-              active={activeKey}
-            />
+            <label key={rkey}>
+              <input
+                type="radio"
+                name="octave"
+                value={Number(val)}
+                onChange={(e) => updateOctave(Number(e.target.value))}
+                checked={Number(val) === tone.octave}
+              />
+              <span>{key}</span>
+            </label>
           );
         })}
+      <div className="piano">
+        {Object.entries(PitchClass)
+          .filter(([key, val]) => !isNaN(Number(val)))
+          .map(([key, val]) => {
+            const idx = `${key}-${Number(val)}`;
+            return (
+              <Key
+                key={idx}
+                name={key}
+                idx={Number(val)}
+                activate={player.play}
+                active={activeKey}
+              />
+            );
+          })}
+      </div>
     </div>
   );
 };
