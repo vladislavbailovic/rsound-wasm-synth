@@ -48,15 +48,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  width: 100vw;
+  justify-content: space-between;
+  width: 100%;
 }
 .modulator-data {
   display: flex;
   justify-content: space-between;
   border: 1px solid var(--button-border-color);
   padding: 10px;
-  margin: 10px;
   width: 48vw;
+  margin-bottom: 10px;
 }
 .modulator-data .modulator,
 .modulator-data .next {

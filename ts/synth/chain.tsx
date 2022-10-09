@@ -96,6 +96,11 @@ const SynthSource = (): JSX.Element | null => {
         : shape;
   });
 
+  let next = null;
+  if (instrument.generator === GeneratorType.Chain) {
+    next = <Next />;
+  }
+
   const changeShape = (shape: Oscillator): void => {
     const params = [new SynthParam(SynthParamType.Oscillator, shape)]; // TODO: merge with existing params
     synthCtx.setData({ ...synthCtx.data, params });
@@ -160,7 +165,7 @@ const SynthSource = (): JSX.Element | null => {
           </fieldset>
         </div>
       </div>
-      <Next />
+      {next}
     </div>
   );
 };

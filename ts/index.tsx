@@ -13,8 +13,6 @@ import init, {
   SynthParamType,
   SynthParam,
   Oscillator,
-  ModulatorRawData,
-  ModulatorKind,
   EnvelopeFactory
 } from '../pkg/rsound_wasm_synth';
 
@@ -24,22 +22,14 @@ const ContextProvider = ({
   children: JSX.Element
 }): JSX.Element => {
   const instrument = new InstrumentRawData(
-    GeneratorType.Detuned,
+    GeneratorType.Simple,
     EnvelopeFactory.ASR(13, 161, 12)
   );
   const synth = {
     tone: new ToneData(PitchClass.A, Octave.C3),
     instrument,
     params: [new SynthParam(SynthParamType.Oscillator, Oscillator.Triangle)],
-    modulators: [
-      new ModulatorRawData(
-        undefined,
-        ModulatorKind.ELFO,
-        undefined,
-        45,
-        EnvelopeFactory.ASR(13, 161, 12)
-      )
-    ]
+    modulators: []
   };
   const [data, setData] = useState<SynthData>(synth);
 
