@@ -32,8 +32,12 @@ impl Syntherpreter {
         }
     }
 
+    pub fn get_envelope(&self) -> Box<dyn instrument::envelope::Envelope> {
+        self.instrument.envelope.clone().into()
+    }
+
     pub fn get_synth(&self) -> instrument::Instrument {
-        let envelope: Box<dyn instrument::envelope::Envelope> = self.instrument.envelope.into();
+        let envelope = self.get_envelope();
         let generator_type: GeneratorType = self.instrument.generator.into();
         let generator: Box<dyn generator::Generator> = match generator_type {
             GeneratorType::Detuned => {

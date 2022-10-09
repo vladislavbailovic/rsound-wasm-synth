@@ -63,8 +63,14 @@ pub fn draw(
     }
 
     let synth = terp.get_synth();
+    let duration = {
+        let note_length = val![1/4];
+        let envelope = terp.get_envelope();
+        let duration = note_length.secs(90.0).min(envelope.min());
+        note::Value::from_secs(duration, 90.0)
+    };
 
-    let n = Note::Tone(tone.pitch.into(), tone.octave.into(), val![1 / 4]);
+    let n = Note::Tone(tone.pitch.into(), tone.octave.into(), duration);
     let sound = synth.play(90.0, n, 1.0);
     graph(&sound)
 }
