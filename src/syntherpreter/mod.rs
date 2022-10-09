@@ -49,7 +49,7 @@ impl Syntherpreter {
                         let freq = if let Some(hz) = self.value(SynthParamType::DetuneHz) {
                             hz
                         } else {
-                            20
+                            0
                         };
                         Box::new(generator::detuned::Freq::new(osc, freq as f64))
                     };

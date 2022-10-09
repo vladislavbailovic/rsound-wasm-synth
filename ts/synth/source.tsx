@@ -101,6 +101,11 @@ const SynthSource = (): JSX.Element | null => {
     next = <Next />;
   }
 
+  let synthParams = null;
+  if (instrument.generator === GeneratorType.Detuned) {
+    synthParams = <SynthSpecificParams />;
+  }
+
   const changeShape = (shape: Oscillator): void => {
     const params = [new SynthParam(SynthParamType.Oscillator, shape)]; // TODO: merge with existing params
     synthCtx.setData({ ...synthCtx.data, params });
@@ -164,8 +169,92 @@ const SynthSource = (): JSX.Element | null => {
               })}
           </fieldset>
         </div>
+
+        {synthParams}
       </div>
       {next}
+    </div>
+  );
+};
+
+const SynthSpecificParams = (): JSX.Element => {
+  const synthCtx = useContext(SynthDataContext);
+
+  let detune = synthCtx.data.params.filter(
+    (x) =>
+      x.kind === SynthParamType.DetuneHz ||
+      x.kind === SynthParamType.DetuneSemitones
+  )[0];
+  if (detune === undefined) {
+    detune = new SynthParam(SynthParamType.DetuneHz, 0);
+  }
+  const detuneType =
+    detune.kind === SynthParamType.DetuneHz
+      ? SynthParamType.DetuneHz
+      : SynthParamType.DetuneSemitones;
+
+  const detuneUnit = detune.kind === SynthParamType.DetuneHz ? 'Hz' : 'Semis';
+  const detuneValue = Number(detune.value);
+  const detuneInput = (
+    <input
+      type="number"
+      min="0"
+      max="100"
+      onChange={(e) => changeDetuneValue(Number(e.target.value))}
+      value={isNaN(detuneValue) ? 0 : detuneValue}
+    />
+  );
+
+  const getUpdatedParams = (x: SynthParam): SynthParam[] => {
+    const params = [...synthCtx.data.params].filter(
+      (y) =>
+        y.kind !== SynthParamType.DetuneHz &&
+        y.kind !== SynthParamType.DetuneSemitones
+    );
+    params.push(x);
+    return params;
+  };
+  const changeDetuneType = (x: SynthParamType): void => {
+    const params = getUpdatedParams(new SynthParam(x, 0));
+    synthCtx.setData({ ...synthCtx.data, params });
+  };
+  const changeDetuneValue = (x: number): void => {
+    const params = getUpdatedParams(new SynthParam(detune.kind, x));
+    synthCtx.setData({ ...synthCtx.data, params });
+  };
+
+  return (
+    <div className="params">
+      <fieldset>
+        <title>Detune</title>
+
+        <label>
+          <input
+            type="radio"
+            name="detune-type"
+            value={SynthParamType.DetuneHz}
+            onChange={(e) => changeDetuneType(SynthParamType.DetuneHz)}
+            checked={detuneType === SynthParamType.DetuneHz}
+          />
+          <span>Hz</span>
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            name="detune-type"
+            value={SynthParamType.DetuneSemitones}
+            onChange={(e) => changeDetuneType(SynthParamType.DetuneSemitones)}
+            checked={detuneType === SynthParamType.DetuneSemitones}
+          />
+          <span>Semitones</span>
+        </label>
+
+        <label>
+          {detuneInput}
+          <span>{detuneUnit}</span>
+        </label>
+      </fieldset>
     </div>
   );
 };
