@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { Display } from '../display';
 import { SynthDataContext } from '../data';
 import { Modulators, Next } from './modulator';
+import { Envelope } from './envelope';
 import {
   draw,
-  draw_env,
   GeneratorType,
   InstrumentRawData,
   ModulatorRawData,
@@ -48,11 +48,45 @@ const SourceEnvelope = (): JSX.Element | null => {
     return null;
   }
 
-  const graph = draw_env(instrument.envelope);
-  const blob = new Blob([graph], { type: 'image/svg+xml' });
-  const tempUrl = window.URL.createObjectURL(blob);
+  const envelope = instrument.envelope;
+  const changeDelay = (ms: number): void => {
+    envelope.delay = ms;
+    synthCtx.setData({
+      ...synthCtx.data,
+      instrument: new InstrumentRawData(instrument.generator, envelope)
+    });
+  };
+  const changeAttack = (ms: number): void => {
+    envelope.attack = ms;
+    synthCtx.setData({
+      ...synthCtx.data,
+      instrument: new InstrumentRawData(instrument.generator, envelope)
+    });
+  };
+  const changeSustain = (ms: number): void => {
+    envelope.sustain = ms;
+    synthCtx.setData({
+      ...synthCtx.data,
+      instrument: new InstrumentRawData(instrument.generator, envelope)
+    });
+  };
+  const changeRelease = (ms: number): void => {
+    envelope.release = ms;
+    synthCtx.setData({
+      ...synthCtx.data,
+      instrument: new InstrumentRawData(instrument.generator, envelope)
+    });
+  };
 
-  return <Display src={tempUrl} />;
+  return (
+    <Envelope
+      envelope={envelope}
+      changeDelay={changeDelay}
+      changeAttack={changeAttack}
+      changeSustain={changeSustain}
+      changeRelease={changeRelease}
+    />
+  );
 };
 
 const SynthSource = (): JSX.Element | null => {

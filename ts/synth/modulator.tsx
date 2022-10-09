@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
 import { Display } from '../display';
+import { Envelope } from './envelope';
 import { SynthDataContext } from '../data';
 import {
   draw_lfo,
-  draw_env,
   Oscillator,
   EnvelopeFactory,
-  EnvelopeKind,
   ModulatorKind,
   ModulatorOp,
   ModulatorRawData
@@ -58,7 +57,7 @@ const Modulator = ({
 
   let envelope = null;
   if (modulator.kind === ModulatorKind.ELFO) {
-    envelope = <Envelope modulator={modulator} idx={idx} />;
+    envelope = <ModulatorEnvelope modulator={modulator} idx={idx} />;
   }
 
   return (
@@ -113,7 +112,7 @@ const Modulator = ({
   );
 };
 
-const Envelope = ({
+const ModulatorEnvelope = ({
   modulator,
   idx
 }: {
@@ -124,11 +123,6 @@ const Envelope = ({
   if (envelope == null) {
     return null;
   }
-  const name = EnvelopeKind[envelope.kind];
-  const graph = draw_env(envelope);
-  const blob = new Blob([graph], { type: 'image/svg+xml' });
-  const tempUrl = window.URL.createObjectURL(blob);
-
   const synthCtx = useContext(SynthDataContext);
   const changeDelay = (ms: number): void => {
     const modulators = [...synthCtx.data.modulators];
@@ -155,60 +149,13 @@ const Envelope = ({
     synthCtx.setData({ ...synthCtx.data, modulators });
   };
   return (
-    <div className="envelope">
-      <div className="shape">
-        <Display src={tempUrl} />
-      </div>
-      <div className="params">
-        <fieldset>
-          <title>{name}</title>
-
-          <label>
-            <input
-              type="number"
-              onChange={(e) => changeDelay(Number(e.target.value))}
-              value={envelope.delay !== undefined ? envelope.delay : 0}
-              min="0"
-              max="1000"
-            />
-            <span>ms</span>
-          </label>
-
-          <label>
-            <input
-              type="number"
-              onChange={(e) => changeAttack(Number(e.target.value))}
-              value={envelope.attack}
-              min="0"
-              max="1000"
-            />
-            <span>ms</span>
-          </label>
-
-          <label>
-            <input
-              type="number"
-              value={envelope.sustain}
-              onChange={(e) => changeSustain(Number(e.target.value))}
-              min="0"
-              max="1000"
-            />
-            <span>ms</span>
-          </label>
-
-          <label>
-            <input
-              type="number"
-              value={envelope.release}
-              onChange={(e) => changeRelease(Number(e.target.value))}
-              min="0"
-              max="1000"
-            />
-            <span>ms</span>
-          </label>
-        </fieldset>
-      </div>
-    </div>
+    <Envelope
+      envelope={envelope}
+      changeDelay={changeDelay}
+      changeAttack={changeAttack}
+      changeSustain={changeSustain}
+      changeRelease={changeRelease}
+    />
   );
 };
 

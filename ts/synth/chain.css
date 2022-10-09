@@ -78,8 +78,7 @@
   display: flex;
   flex-direction: column;
 }
-.modulator .lfo,
-.modulator .envelope {
+.modulator .lfo {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

@@ -1,0 +1,20 @@
+.envelope {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.envelope .params fieldset {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 0;
+  padding: 0;
+  margin: 0 10px;
+}
+.envelope .params label {
+  display: block;
+  white-space: nowrap;
+}
+.envelope .params input[type="number"] + span {
+  padding-left: 0.2em;
+}
